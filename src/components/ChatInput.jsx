@@ -114,6 +114,11 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       return
     }
 
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError('File must be under 10 MB')
+      return
+    }
+
     setUploadError(null)
     setUploading(true)
     setUploadedDoc({ id: null, name: file.name, status: 'uploading' })

@@ -33,6 +33,7 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
   const handleGenerate = async (e) => {
     e.preventDefault();
     if (mode === 'text' && !sourceText.trim()) return;
+    if (mode === 'text' && sourceText.length > 50000) return;
     if (mode === 'document' && !selectedDocument) return;
     if (mode === 'file' && !selectedFile) return;
 
@@ -137,9 +138,14 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
                   value={sourceText}
                   onChange={e => setSourceText(e.target.value)}
                   placeholder="Paste your study material here..."
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600/20 placeholder-slate-400 h-24 resize-none"
+                  className={`w-full border rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:ring-1 placeholder-slate-400 h-24 resize-none ${sourceText.length > 50000 ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-purple-600 focus:ring-purple-600/20'}`}
                   autoFocus
                 />
+                {sourceText.length > 40000 && (
+                  <p className={`text-xs mt-1 text-right ${sourceText.length > 50000 ? 'text-red-500 font-medium' : 'text-slate-400'}`}>
+                    {sourceText.length.toLocaleString()}/50,000
+                  </p>
+                )}
               </div>
             )}
 
@@ -147,7 +153,14 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
               <div>
                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5 block">Upload File (PDF, DOCX, DOC, PPTX)</label>
                 <div className="border-2 border-dashed border-purple-300 rounded-xl p-6 text-center hover:border-purple-500 hover:bg-purple-50 transition-colors">
-                  <input type="file" accept=".pdf,.docx,.doc,.pptx" onChange={e => setSelectedFile(e.target.files?.[0] || null)} className="hidden" id="mcq-file-input" />
+                  <input type="file" accept=".pdf,.docx,.doc,.pptx" onChange={e => {
+                    const f = e.target.files?.[0] || null
+                    if (f && f.size > 10 * 1024 * 1024) {
+                      setError('File must be under 10 MB')
+                      return
+                    }
+                    setSelectedFile(f); setError(null)
+                  }} className="hidden" id="mcq-file-input" />
                   <label htmlFor="mcq-file-input" className="cursor-pointer block">
                     <Upload size={20} className="mx-auto mb-2 text-purple-600" />
                     <p className="text-sm font-medium text-slate-700">Click to upload or drag and drop</p>
@@ -188,7 +201,7 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
 
             <button
               type="submit"
-              disabled={loading || (mode === 'text' ? !sourceText.trim() : mode === 'file' ? !selectedFile : !selectedDocument)}
+              disabled={loading || (mode === 'text' ? !sourceText.trim() || sourceText.length > 50000 : mode === 'file' ? !selectedFile : !selectedDocument)}
               className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? <><Loader2 size={16} className="animate-spin" /> Generating...</> : <><Zap size={16} /> Generate MCQs</>}

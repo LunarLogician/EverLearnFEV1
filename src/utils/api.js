@@ -29,6 +29,12 @@ api.interceptors.response.use(
       localStorage.removeItem('token')
       window.location.href = '/'
     }
+    // Normalize 413 (payload too large / file too big) into a readable message
+    if (error.response?.status === 413) {
+      if (!error.response.data) error.response.data = {}
+      error.response.data.message =
+        error.response.data?.message || 'File is too large. Please check the size limit and try again.'
+    }
     // Dispatch upgrade event so any component can show the paywall
     if (
       (error.response?.status === 403 || error.response?.status === 429) &&
