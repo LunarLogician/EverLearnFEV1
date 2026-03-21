@@ -6,6 +6,7 @@ import ChatPage from './pages/ChatPage'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import MCQPage from './pages/MCQPage'
+import ExamPaperPage from './pages/ExamPaperPage'
 import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import PaywallModal from './components/PaywallModal'
@@ -33,6 +34,7 @@ function App() {
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/mcq" element={<MCQPage />} />
+            <Route path="/exam-papers" element={<ExamPaperPage />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
           </Routes>

@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
-import { quizService, flashcardService, chatService, subscriptionService, mcqService, documentService } from '../services'
+import { quizService, flashcardService, chatService, subscriptionService, mcqService, documentService, examPaperService } from '../services'
 import AuthModal from '../components/AuthModal'
+import { ExamPaperGeneratorModal, ExamPaperViewModal } from './ExamPaperPage'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import {
   MessageSquare, BookOpen, Layers, FileText, LogOut, Plus,
   ChevronRight, Trophy, Zap, Target, X, Loader2, CheckCircle,
   AlertCircle, BarChart2, Clock, Star, Upload, Paperclip, Trash2,
+  ClipboardList,
 } from 'lucide-react'
 
 // ── Quiz Generator Modal ──────────────────────────────────────────────────────
@@ -1141,6 +1143,11 @@ export default function Dashboard() {
   const [deletingQuizId, setDeletingQuizId] = useState(null)
   const [loadingMCQId, setLoadingMCQId] = useState(null)
   const [deletingMcqId, setDeletingMcqId] = useState(null)
+  const [examPapers, setExamPapers] = useState([])
+  const [loadingExamPaperId, setLoadingExamPaperId] = useState(null)
+  const [deletingExamPaperId, setDeletingExamPaperId] = useState(null)
+  const [activeExamPaper, setActiveExamPaper] = useState(null)
+  const [showExamPaperModal, setShowExamPaperModal] = useState(false)
   const [userPlan, setUserPlan] = useState('free')
 
   const userInitials = user?.name
@@ -1155,15 +1162,17 @@ export default function Dashboard() {
     setDataLoading(true)
     fetchChatCount()
     try {
-      const [qData, fData, mData, subData] = await Promise.all([
+      const [qData, fData, mData, subData, epData] = await Promise.all([
         quizService.getUserQuizzes(),
         flashcardService.getUserFlashcards(),
         mcqService.getMCQs().catch(() => ({ mcqs: [] })),
         subscriptionService.getSubscription().catch(() => null),
+        examPaperService.list().catch(() => ({})),
       ])
       setQuizzes(qData.quizzes || [])
       setFlashcardSets(fData.flashcards || [])
       setMcqs(mData.mcqs || [])
+      setExamPapers(epData.exams || epData.examPapers || epData.papers || [])
       setUserPlan(subData?.subscription?.plan || 'free')
     } catch { /* silently ignore */ }
     finally { setDataLoading(false) }
@@ -1209,6 +1218,28 @@ export default function Dashboard() {
       setMcqs(prev => prev.filter(m => m._id !== mcqId))
     } catch { /* ignore */ }
     finally { setDeletingMcqId(null) }
+  }
+
+  const openExamPaper = async (paperOrObj) => {
+    if (paperOrObj.questions) { setActiveExamPaper(paperOrObj); return }
+    const id = paperOrObj._id
+    setLoadingExamPaperId(id)
+    try {
+      const data = await examPaperService.getExamPaper(id)
+      setActiveExamPaper(data.exam || data.examPaper)
+    } catch { /* ignore */ }
+    finally { setLoadingExamPaperId(null) }
+  }
+
+  const deleteExamPaper = async (e, examId) => {
+    e.stopPropagation()
+    if (!window.confirm('Delete this exam paper? This cannot be undone.')) return
+    setDeletingExamPaperId(examId)
+    try {
+      await examPaperService.deleteExamPaper(examId)
+      setExamPapers(prev => prev.filter(p => p._id !== examId))
+    } catch { /* ignore */ }
+    finally { setDeletingExamPaperId(null) }
   }
 
   const openQuiz = async (quizOrId) => {
@@ -1332,6 +1363,20 @@ export default function Dashboard() {
       actionLabel: 'Upload & Chat',
     },
     {
+      icon: <ClipboardList size={22} />,
+      label: 'Exam Papers',
+      description: 'Generate full exam papers with MCQs, short & long answers',
+      color: 'bg-teal-600',
+      light: 'bg-teal-50 border-teal-100',
+      textColor: 'text-teal-700',
+      stat: `${examPapers.length} paper${examPapers.length !== 1 ? 's' : ''} created`,
+      action: () => {
+        if (!user) { setShowAuthModal(true); return }
+        navigate('/exam-papers')
+      },
+      actionLabel: 'Open Exam Papers',
+    },
+    {
       icon: <BarChart2 size={22} />,
       label: 'Progress',
       description: 'Track your study streaks and quiz scores',
@@ -1365,6 +1410,12 @@ export default function Dashboard() {
             className="px-3 py-1.5 text-white text-xs font-semibold rounded-lg bg-white/10"
           >
             Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/exam-papers')}
+            className="px-3 py-1.5 text-white/60 text-xs font-medium rounded-lg hover:bg-white/[0.06] transition-colors"
+          >
+            Exam Papers
           </button>
           <button
             onClick={() => navigate('/chat')}
@@ -1428,6 +1479,7 @@ export default function Dashboard() {
               { label: 'Quizzes', value: quizzes.length, icon: <Target size={15} />, color: 'text-violet-600', bg: 'bg-violet-50' },
               { label: 'Flashcard Sets', value: flashcardSets.length, icon: <Layers size={15} />, color: 'text-amber-600', bg: 'bg-amber-50' },
               { label: 'MCQs Created', value: mcqs.length, icon: <BookOpen size={15} />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+              { label: 'Exam Papers', value: examPapers.length, icon: <ClipboardList size={15} />, color: 'text-teal-700', bg: 'bg-teal-50' },
               // Removed Free Chats Left stat
             ].map((s, i) => (
               <div key={i} className="bg-white rounded-2xl border border-gray-100 px-4 py-4 shadow-sm flex items-center gap-3">
@@ -1643,6 +1695,58 @@ export default function Dashboard() {
           </motion.div>
         )}
 
+        {/* Recent Exam Papers */}
+        {user && examPapers.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
+                <ClipboardList size={16} className="text-teal-600" /> Recent Exam Papers
+              </h2>
+              <button onClick={() => setShowExamPaperModal(true)} className="flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:text-emerald-600 transition-colors">
+                <Plus size={13} /> New Paper
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {examPapers.slice(0, 6).map((paper) => (
+                <div
+                  key={paper._id}
+                  onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)}
+                  className={`relative bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:border-teal-200 transition-all group ${loadingExamPaperId === paper._id || deletingExamPaperId === paper._id ? 'opacity-60 pointer-events-none' : ''}`}
+                >
+                  <button
+                    onClick={(e) => deleteExamPaper(e, paper._id)}
+                    disabled={!!deletingExamPaperId || !!loadingExamPaperId}
+                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 disabled:hidden"
+                    title="Delete exam paper"
+                  >
+                    {deletingExamPaperId === paper._id
+                      ? <Loader2 size={13} className="animate-spin text-red-400" />
+                      : <Trash2 size={13} />}
+                  </button>
+                  <div className="flex items-start gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-200 transition-colors">
+                      {loadingExamPaperId === paper._id
+                        ? <Loader2 size={16} className="text-teal-600 animate-spin" />
+                        : <ClipboardList size={16} className="text-teal-700" />}
+                    </div>
+                    <div className="min-w-0 flex-1 pr-5">
+                      <p className="text-slate-800 font-semibold text-sm truncate">{paper.title}</p>
+                      <p className="text-slate-400 text-xs mt-0.5">{paper.questions?.length ?? paper.totalQuestions ?? '—'} questions · {paper.totalMarks} marks</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
+                      <Clock size={11} />
+                      <span>{new Date(paper.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <span className="text-[11px] text-teal-700 font-semibold group-hover:underline">View →</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         {/* Empty state when logged out */}
         {!user && (
           <motion.div
@@ -1704,6 +1808,19 @@ export default function Dashboard() {
           <FlashcardModal
             set={activeFlashSet}
             onClose={() => setActiveFlashSet(null)}
+          />
+        )}
+        {showExamPaperModal && (
+          <ExamPaperGeneratorModal
+            onClose={() => setShowExamPaperModal(false)}
+            onCreated={loadData}
+            onView={(paper) => { setShowExamPaperModal(false); setActiveExamPaper(paper) }}
+          />
+        )}
+        {activeExamPaper && (
+          <ExamPaperViewModal
+            paper={activeExamPaper}
+            onClose={() => setActiveExamPaper(null)}
           />
         )}
       </AnimatePresence>

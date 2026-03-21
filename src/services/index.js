@@ -210,6 +210,56 @@ export const documentService = {
   },
 }
 
+export const examPaperService = {
+  list: async () => {
+    const response = await api.get('/exam-papers/list')
+    return response.data
+  },
+  generate: async ({ sourceText, title, subject, difficulty, numQuestions, duration }) => {
+    const response = await api.post('/exam-papers/generate', {
+      sourceText,
+      title,
+      subject,
+      difficulty,
+      numQuestions,
+      duration,
+    })
+    return response.data
+  },
+  generateFromDocument: async ({ documentId, title, subject, difficulty, numQuestions, duration }) => {
+    const response = await api.post('/exam-papers/generate-from-document', {
+      documentId,
+      title,
+      subject,
+      difficulty,
+      numQuestions,
+      duration,
+    })
+    return response.data
+  },
+  generateFromFile: async ({ file, title, subject, difficulty, numQuestions, duration }) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (title) formData.append('title', title)
+    if (subject) formData.append('subject', subject)
+    if (difficulty) formData.append('difficulty', difficulty)
+    if (numQuestions) formData.append('numQuestions', numQuestions)
+    if (duration) formData.append('duration', duration)
+    const response = await api.post('/exam-papers/generate-from-file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data
+  },
+  getExamPaper: async (examId) => {
+    const response = await api.get(`/exam-papers/${examId}`)
+    return response.data
+  },
+  deleteExamPaper: async (examId) => {
+    const response = await api.delete(`/exam-papers/${examId}`)
+    return response.data
+  },
+}
+
 export const subscriptionService = {
   getPlans: async () => {
     const response = await api.get('/subscription/plans')

@@ -8,7 +8,7 @@ import ChatInput from '../components/ChatInput'
 import PaywallModal from '../components/PaywallModal'
 import { chatService } from '../services'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard } from 'lucide-react'
+import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText } from 'lucide-react'
 
 export default function ChatPage() {
   const navigate = useNavigate()
@@ -89,6 +89,13 @@ export default function ChatPage() {
           >
             <LayoutDashboard size={14} />
             Dashboard
+          </button>
+          <button
+            onClick={() => navigate('/exam-papers')}
+            className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.06] text-sm font-medium transition-colors"
+          >
+            <FileText size={14} />
+            Exam Papers
           </button>
         </div>
       )}
