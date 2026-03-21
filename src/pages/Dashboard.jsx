@@ -1372,9 +1372,13 @@ export default function Dashboard() {
       stat: `${examPapers.length} paper${examPapers.length !== 1 ? 's' : ''} created`,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
+        if (userPlan !== 'pro') {
+          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
+          return
+        }
         navigate('/exam-papers')
       },
-      actionLabel: 'Open Exam Papers',
+      actionLabel: userPlan === 'pro' ? 'Open Exam Papers' : 'Upgrade to Pro',
     },
     {
       icon: <BarChart2 size={22} />,
