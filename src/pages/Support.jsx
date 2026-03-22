@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: 'How do I cancel my subscription?',
-    a: 'Email us at zlabservices@gmail.com with your account email and we will cancel it immediately. You keep access until the end of your billing period.',
+    a: 'Email us at zlabservices@gmail.com with your account email and the subject line "Cancel subscription". We will cancel it the same day. You keep access until the end of your current billing period and won\'t be charged again.',
   },
   {
     q: 'I was charged but my plan did not update.',

@@ -107,7 +107,9 @@ export default function Terms() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">9. Termination</h2>
             <p>
-              We reserve the right to suspend or terminate accounts that violate these terms, without prior notice. You may cancel your account at any time by contacting us. Cancellation stops future billing but does not entitle you to a refund for the current period.
+              We reserve the right to suspend or terminate accounts that violate these terms, without prior notice. To cancel your subscription, email us at{' '}
+              <a href="mailto:zlabservices@gmail.com" className="text-emerald-700 hover:underline">zlabservices@gmail.com</a>{' '}
+              with your account email and we will cancel it promptly. You keep access until the end of your current billing period and will not be charged again.
             </p>
           </section>
 
