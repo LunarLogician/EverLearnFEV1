@@ -82,7 +82,7 @@ const STEPS = [
   {
     num: '01',
     name: 'Create your account',
-    desc: 'Sign up in seconds — no credit card required. You get 10 free chats and full access to all tools immediately.',
+    desc: 'Sign up in seconds — no credit card required. You get 200 free tokens and full access to all tools immediately.',
   },
   {
     num: '02',
@@ -126,11 +126,12 @@ const TESTIMONIALS = [
   },
 ]
 
-// Real plans from Polar.sh
+// Real plans from Lemon Squeezy
 const PLANS = [
   {
     tier: 'Basic',
     price: 'PKR 999',
+    usd: '~$3.50',
     period: 'per month',
     desc: '100,000 AI tokens/month',
     features: [
@@ -148,6 +149,7 @@ const PLANS = [
   {
     tier: 'Pro',
     price: 'PKR 1,999',
+    usd: '~$7',
     period: 'per month',
     desc: '500,000 AI tokens/month',
     features: [
@@ -314,8 +316,28 @@ export default function Home() {
         )}
       </nav>
 
+      {/* ─── MOBILE APP BANNER ──────────────────────────────────────────────── */}
+      <div className="fixed top-[65px] left-0 right-0 z-40 bg-gray-950 border-b border-white/10 py-2 px-5 sm:px-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <p className="text-xs text-white/70">
+            <span className="font-semibold text-white">EverlearnAI is also on Android!</span>
+            <span className="hidden sm:inline text-white/50"> — same tools, quizzes & chat on your phone.</span>
+          </p>
+          <a
+            href="#"
+            aria-label="Get EverlearnAI on Google Play"
+            className="shrink-0 inline-flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-950 rounded-lg text-xs font-semibold transition-all"
+          >
+            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" fill="currentColor" aria-hidden="true">
+              <path d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm11.155 11.742L1.321 23.566c.116.064.248.1.39.1.145 0 .277-.038.395-.106l13.688-7.754-4.302-4.14zm5.883-5.585L5.119 0 9.507 4.365l8.868 5.716z"/>
+            </svg>
+            Get it on Google Play
+          </a>
+        </div>
+      </div>
+
       {/* ─── HERO ────────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden px-5 sm:px-6" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '96px', paddingBottom: '64px' }}>
+      <section className="relative overflow-hidden px-5 sm:px-6" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '136px', paddingBottom: '64px' }}>
         {/* BG effects */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_900px_600px_at_50%_30%,rgba(16,185,129,0.07),transparent_70%)]" />
@@ -378,8 +400,9 @@ export default function Home() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
             className="mt-4 text-xs text-gray-400"
           >
-            No credit card required · 5 free chats included · Upgrade anytime
+            No credit card required · 200 free tokens included · Upgrade anytime
           </motion.p>
+
         </div>
 
         {/* Floating tool pills */}
@@ -630,7 +653,7 @@ export default function Home() {
                     onClick={() => navigate('/chat')}
                     className="flex-1 sm:flex-none px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-sm font-semibold transition-all"
                   >
-                    Try free chats
+                    Try for free
                   </button>
                   <button
                     onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
@@ -739,7 +762,7 @@ export default function Home() {
                       { label: 'Quizzes', value: '2' },
                       { label: 'Flashcard Sets', value: '2' },
                       { label: 'MCQs Created', value: '4' },
-                      { label: 'Free Chats Left', value: '3' },
+                      { label: 'Free Tokens Left', value: '200' },
                     ].map((s) => (
                       <div key={s.label} className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-left">
                         <div className="text-[11px] text-slate-400">{s.label}</div>
@@ -896,6 +919,7 @@ export default function Home() {
                   </div>
 
                   <div className="serif text-5xl tracking-tight mb-1">{plan.price}</div>
+                  <div className={`text-xs font-medium mb-1 ${plan.featured ? 'text-emerald-400/70' : 'text-gray-400'}`}>{plan.usd} USD</div>
                   <div className={`text-sm mb-1 ${plan.featured ? 'text-emerald-300' : 'text-gray-400'}`}>{plan.period}</div>
                   <div className={`text-xs mb-7 ${plan.featured ? 'text-emerald-400/70' : 'text-gray-400'}`}>{plan.desc}</div>
 
@@ -931,7 +955,7 @@ export default function Home() {
               <p className="text-sm text-gray-500">
                 Not ready to commit?{' '}
                 <button onClick={() => navigate('/chat')} className="text-emerald-700 font-semibold hover:underline">
-                  Start with 5 free chats →
+                  Start with 200 free tokens →
                 </button>
               </p>
             </div>
@@ -955,7 +979,7 @@ export default function Home() {
             {[
               {
                 q: 'Is it free to try?',
-                a: 'Yes. You get 5 free chats to test the experience before upgrading.',
+                a: 'Yes. You get 200 free tokens to test the experience before upgrading.',
               },
               {
                 q: 'Will it help with exam prep?',
@@ -1019,8 +1043,8 @@ export default function Home() {
             <span className="font-semibold text-sm">Everlearn<span className="text-emerald-700">AI</span></span>
           </div>
           <div className="flex gap-6">
-            {['Privacy', 'Terms', 'Support', 'Contact'].map((l) => (
-              <a key={l} href="#" className="text-sm text-gray-400 hover:text-emerald-700 transition-colors">{l}</a>
+            {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Support', '/support'], ['Contact', '/contact']].map(([l, href]) => (
+              <a key={l} href={href} className="text-sm text-gray-400 hover:text-emerald-700 transition-colors">{l}</a>
             ))}
           </div>
           <p className="text-xs text-gray-400">© 2026 EverlearnAI. Built for students.</p>

@@ -9,6 +9,10 @@ import MCQPage from './pages/MCQPage'
 import ExamPaperPage from './pages/ExamPaperPage'
 import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import Terms from './pages/Terms'
+import Support from './pages/Support'
+import Contact from './pages/Contact'
 import PaywallModal from './components/PaywallModal'
 import './styles/index.css'
 
@@ -37,6 +41,10 @@ function App() {
             <Route path="/exam-papers" element={<ExamPaperPage />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
         </BrowserRouter>
         {paywallOpen && (
