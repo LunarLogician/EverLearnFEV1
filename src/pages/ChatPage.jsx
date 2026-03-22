@@ -57,7 +57,7 @@ export default function ChatPage() {
       <div className="px-5 py-5 border-b border-white/[0.06] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-lg overflow-hidden flex-shrink-0">
-            <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <p className="text-white font-bold text-sm leading-none">Everlearn</p>

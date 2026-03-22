@@ -17,7 +17,7 @@ export default function Terms() {
         <span className="text-gray-300">|</span>
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md overflow-hidden">
-            <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
           </div>
           <span className="font-semibold text-sm">
             Everlearn<span className="text-emerald-700">AI</span>

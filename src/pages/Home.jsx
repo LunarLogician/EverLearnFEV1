@@ -221,7 +221,7 @@ export default function Home() {
         <div className="px-5 md:px-12 py-4 max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg overflow-hidden">
-              <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-semibold text-gray-900 tracking-tight">
               Everlearn<span className="text-emerald-700">AI</span>
@@ -489,7 +489,7 @@ export default function Home() {
               <div className="px-5 sm:px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-9 h-9 rounded-xl overflow-hidden">
-                    <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+                    <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-gray-900 truncate">
@@ -1038,7 +1038,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md overflow-hidden">
-              <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+              <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
             </div>
             <span className="font-semibold text-sm">Everlearn<span className="text-emerald-700">AI</span></span>
           </div>

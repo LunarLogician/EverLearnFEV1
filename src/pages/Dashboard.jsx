@@ -1400,7 +1400,7 @@ export default function Dashboard() {
       <header className="bg-[#111111] px-4 md:px-8 py-3.5 flex items-center justify-between flex-shrink-0 sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg overflow-hidden">
-            <img src="/favicon.png" alt="Everlearn logo" className="w-full h-full object-contain" />
+            <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <p className="text-white font-bold text-sm leading-none">Everlearn</p>
