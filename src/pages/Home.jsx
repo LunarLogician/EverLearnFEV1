@@ -82,7 +82,7 @@ const STEPS = [
   {
     num: '01',
     name: 'Create your account',
-    desc: 'Sign up in seconds — no credit card required. You get 200 free tokens and full access to all tools immediately.',
+    desc: 'Sign up in seconds — no credit card required. You get 10,000 free tokens and full access to all tools immediately.',
   },
   {
     num: '02',
@@ -133,12 +133,12 @@ const PLANS = [
     price: 'PKR 999',
     usd: '~$3.50',
     period: 'per month',
-    desc: '100,000 AI tokens/month',
+    desc: '200,000 AI tokens/month',
     features: [
       { text: 'AI Chat', ok: true },
       { text: 'Document Q&A', ok: true },
       { text: 'Assignment generation & analysis', ok: true },
-      { text: '100K tokens/month', ok: true },
+      { text: '200K tokens/month', ok: true },
       { text: 'Flashcard generation', ok: false },
       { text: 'Quiz creation & analysis', ok: false },
       { text: 'Priority support', ok: false },
@@ -151,14 +151,14 @@ const PLANS = [
     price: 'PKR 1,999',
     usd: '~$7',
     period: 'per month',
-    desc: '500,000 AI tokens/month',
+    desc: '1,000,000 AI tokens/month',
     features: [
       { text: 'Everything in Basic', ok: true },
       { text: 'Advanced document analysis', ok: true },
       { text: 'Document Q&A & summaries', ok: true },
       { text: 'Flashcard generation', ok: true },
       { text: 'Quiz and MCQ creation & analysis', ok: true },
-      { text: '500K tokens/month', ok: true },
+      { text: '1M tokens/month', ok: true },
       { text: 'Priority support', ok: true },
     ],
     cta: 'Get Pro',
@@ -400,7 +400,7 @@ export default function Home() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
             className="mt-4 text-xs text-gray-400"
           >
-            No credit card required · 200 free tokens included · Upgrade anytime
+            No credit card required · 10,000 free tokens included · Upgrade anytime
           </motion.p>
 
         </div>
@@ -763,6 +763,7 @@ export default function Home() {
                       { label: 'Flashcard Sets', value: '2' },
                       { label: 'MCQs Created', value: '4' },
                       { label: 'Free Tokens Left', value: '200' },
+                                      { label: 'Free Tokens Left', value: '10,000' },
                     ].map((s) => (
                       <div key={s.label} className="px-3 py-2 rounded-xl bg-white border border-gray-200 text-left">
                         <div className="text-[11px] text-slate-400">{s.label}</div>
@@ -955,7 +956,7 @@ export default function Home() {
               <p className="text-sm text-gray-500">
                 Not ready to commit?{' '}
                 <button onClick={() => navigate('/chat')} className="text-emerald-700 font-semibold hover:underline">
-                  Start with 200 free tokens →
+                  Start with 10,000 free tokens →
                 </button>
               </p>
             </div>

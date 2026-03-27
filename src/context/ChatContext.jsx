@@ -11,7 +11,7 @@ export const ChatProvider = ({ children }) => {
   const [error, setError] = useState(null)
   const [chatCount, setChatCount] = useState(0)
   const [tokenCount, setTokenCount] = useState(0)
-  const [tokenLimit, setTokenLimit] = useState(200)
+  const [tokenLimit, setTokenLimit] = useState(10000)
   const [userPlan, setUserPlan] = useState('free')
   const [hasUnlimitedChats, setHasUnlimitedChats] = useState(false)
   const [activeChatId, setActiveChatId] = useState(null)
