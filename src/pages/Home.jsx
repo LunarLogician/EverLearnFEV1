@@ -151,6 +151,8 @@ const PLANS = [
     price: 'PKR 1,999',
     usd: '~$7',
     period: 'per month',
+    badge: '5x More Tokens',
+    comparison: '5x tokens for 2x the price',
     desc: '1,000,000 AI tokens/month',
     features: [
       { text: 'Everything in Basic', ok: true },
@@ -922,7 +924,12 @@ export default function Home() {
                   <div className="serif text-5xl tracking-tight mb-1">{plan.price}</div>
                   <div className={`text-xs font-medium mb-1 ${plan.featured ? 'text-emerald-400/70' : 'text-gray-400'}`}>{plan.usd} USD</div>
                   <div className={`text-sm mb-1 ${plan.featured ? 'text-emerald-300' : 'text-gray-400'}`}>{plan.period}</div>
-                  <div className={`text-xs mb-7 ${plan.featured ? 'text-emerald-400/70' : 'text-gray-400'}`}>{plan.desc}</div>
+                  <div className={`text-xs mb-3 ${plan.featured ? 'text-emerald-400/70' : 'text-gray-400'}`}>{plan.desc}</div>
+                  {plan.comparison && (
+                    <div className={`text-xs font-semibold mb-7 px-3 py-2 rounded-lg ${plan.featured ? 'bg-emerald-400/20 text-emerald-200' : 'bg-emerald-50 text-emerald-700'}`}>
+                      {plan.comparison}
+                    </div>
+                  )}
 
                   <ul className={`space-y-3 mb-8 border-t pt-6 ${plan.featured ? 'border-white/10' : 'border-gray-100'}`}>
                     {plan.features.map((f, i) => (
