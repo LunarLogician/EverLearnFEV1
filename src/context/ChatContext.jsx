@@ -113,6 +113,19 @@ export const ChatProvider = ({ children }) => {
     }
   }, [])
 
+  const deleteChat = useCallback(async (chatId) => {
+    await chatService.deleteChat(chatId)
+    // If the deleted chat is the active one, reset the view
+    setActiveChatId((prev) => (prev === chatId ? null : prev))
+  }, [])
+
+  const deleteAllChats = useCallback(async () => {
+    await chatService.deleteAllChats()
+    setMessages([])
+    setError(null)
+    setActiveChatId(null)
+  }, [])
+
   const resetChat = useCallback(() => {
     setMessages([])
     setError(null)
@@ -137,6 +150,8 @@ export const ChatProvider = ({ children }) => {
         fetchChatCount,
         loadHistory,
         resetChat,
+        deleteChat,
+        deleteAllChats,
         setMessages,
       }}
     >

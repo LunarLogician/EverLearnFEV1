@@ -78,6 +78,16 @@ export const chatService = {
     const response = await api.get('/chat/history')
     return response.data
   },
+
+  deleteChat: async (chatId) => {
+    const response = await api.delete(`/chat/${chatId}`)
+    return response.data
+  },
+
+  deleteAllChats: async () => {
+    const response = await api.delete('/chat/all')
+    return response.data
+  },
 }
 
 export const quizService = {

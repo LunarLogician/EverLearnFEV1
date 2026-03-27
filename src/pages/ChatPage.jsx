@@ -8,12 +8,12 @@ import ChatInput from '../components/ChatInput'
 import PaywallModal from '../components/PaywallModal'
 import { chatService } from '../services'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText } from 'lucide-react'
+import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText, Trash2 } from 'lucide-react'
 
 export default function ChatPage() {
   const navigate = useNavigate()
   const { user, loading: authLoading, logout } = useAuth()
-  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading } = useChat()
+  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats } = useChat()
 
   const [showPaywall, setShowPaywall] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -107,6 +107,18 @@ export default function ChatPage() {
             <p className="text-white/30 text-[10px] font-semibold uppercase tracking-widest mb-3 px-1">
               Recent Chats
             </p>
+            {recentChats.length > 0 && (
+              <button
+                onClick={async () => {
+                  await deleteAllChats()
+                  setRecentChats([])
+                }}
+                className="w-full flex items-center gap-1.5 px-3 py-1.5 mb-2 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-white/[0.06] text-xs font-medium transition-colors"
+              >
+                <Trash2 size={12} />
+                Delete all chats
+              </button>
+            )}
             {recentChats.length === 0 ? (
               <p className="text-white/25 text-xs px-1">No chats yet. Start a new session!</p>
             ) : (
@@ -114,10 +126,21 @@ export default function ChatPage() {
                 <div
                   key={chat._id}
                   onClick={() => { loadHistory(); setSidebarOpen(false) }}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] cursor-pointer transition-all mb-0.5"
+                  className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] cursor-pointer transition-all mb-0.5"
                 >
                   <MessageSquare size={13} className="flex-shrink-0" />
-                  <span className="text-xs truncate">{chat.title || 'Untitled'}</span>
+                  <span className="text-xs truncate flex-1">{chat.title || 'Untitled'}</span>
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      await deleteChat(chat._id)
+                      setRecentChats((prev) => prev.filter((c) => c._id !== chat._id))
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 text-white/30 hover:text-red-400 transition-all rounded flex-shrink-0"
+                    title="Delete chat"
+                  >
+                    <Trash2 size={11} />
+                  </button>
                 </div>
               ))
             )}
