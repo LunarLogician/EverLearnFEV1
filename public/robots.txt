@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /private
+Disallow: /api
+Disallow: /dashboard
+Crawl-delay: 1
+
+Sitemap: https://everlearn.ai/sitemap.xml

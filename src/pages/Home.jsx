@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
+import { SEOHelmet } from '../components/SEOHelmet'
+import { StructuredData } from '../components/StructuredData'
 import {
   MessageSquare, Target, Layers, PenLine,
   FileText, BarChart2, ArrowRight, Check, X,
@@ -201,6 +203,12 @@ export default function Home() {
 
   return (
     <div className="bg-[#fdfcf8] text-gray-900 overflow-x-hidden">
+      <SEOHelmet 
+        title="EverlearnAI - Free MCQ Generator, Quiz Maker & Study Tools"
+        description="Generate MCQs, flashcards, and quizzes from any topic. Chat with documents. Get instant homework help. Start free with 10,000 tokens."
+        url="https://everlearn.ai/"
+      />
+      <StructuredData />
 
       <style>{`
         .serif { font-family: 'Instrument Serif', Georgia, serif; }

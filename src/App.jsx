@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './context/AuthContext'
 import { ChatProvider } from './context/ChatContext'
 import ChatPage from './pages/ChatPage'
@@ -30,9 +31,10 @@ function App() {
   }, [])
 
   return (
-    <AuthProvider>
-      <ChatProvider>
-        <BrowserRouter>
+    <HelmetProvider>
+      <AuthProvider>
+        <ChatProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<ChatPage />} />
@@ -56,6 +58,7 @@ function App() {
         )}
       </ChatProvider>
     </AuthProvider>
+    </HelmetProvider>
   )
 }
 
