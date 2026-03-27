@@ -136,6 +136,7 @@ const PLANS = [
     desc: '200,000 AI tokens/month',
     features: [
       { text: 'AI Chat', ok: true },
+      { text: 'Chat History', ok: true },
       { text: 'Document Q&A', ok: true },
       { text: 'Assignment generation & analysis', ok: true },
       { text: '200K tokens/month', ok: true },
@@ -156,6 +157,7 @@ const PLANS = [
     desc: '1,000,000 AI tokens/month',
     features: [
       { text: 'Everything in Basic', ok: true },
+      { text: 'Chat History (unlimited)', ok: true },
       { text: 'Advanced document analysis', ok: true },
       { text: 'Document Q&A & summaries', ok: true },
       { text: 'Flashcard generation', ok: true },
@@ -165,7 +167,7 @@ const PLANS = [
     ],
     cta: 'Get Pro',
     featured: true,
-  },
+  },,
 ]
 
 const TOOL_PILLS = [
