@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { SEOHelmet } from '../components/SEOHelmet'
 import { quizService, flashcardService, chatService, subscriptionService, mcqService, documentService, examPaperService } from '../services'
 import AuthModal from '../components/AuthModal'
 import { ExamPaperGeneratorModal, ExamPaperViewModal } from './ExamPaperPage'
@@ -1394,6 +1395,14 @@ export default function Dashboard() {
   ]
 
   return (
+  return (
+    <>
+      <SEOHelmet 
+        title="Student Dashboard - Track Progress - EverlearnAI"
+        description="Track your study progress, token usage, and quiz scores in one place. Monitor your learning journey."
+        url="https://everlearn.ai/dashboard"
+        keywords="dashboard, progress tracking, study stats, performance analytics"
+      />
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
 
       {/* ── Top Navbar ── */}
@@ -1831,5 +1840,6 @@ export default function Dashboard() {
 
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
+    </>
   )
 }

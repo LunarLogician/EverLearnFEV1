@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { SEOHelmet } from '../components/SEOHelmet'
 import AuthModal from '../components/AuthModal'
 import ChatWindow from '../components/ChatWindow'
 import ChatInput from '../components/ChatInput'
@@ -48,7 +49,8 @@ export default function ChatPage() {
       <div className="flex items-center justify-center min-h-screen bg-[#f8fafc]">
         <div className="h-10 w-10 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
       </div>
-    )
+    </>
+  )
   }
 
   const SidebarContent = () => (
@@ -192,6 +194,13 @@ export default function ChatPage() {
   )
 
   return (
+    <>
+      <SEOHelmet 
+        title="AI Chat - Ask Homework Questions 24/7 - EverlearnAI"
+        description="Chat with AI tutor 24/7 for homework help, exam prep, and concept clarification. Get instant answers to any academic question."
+        url="https://everlearn.ai/chat"
+        keywords="AI homework help, tutoring, exam prep, study assistant, Q&A"
+      />
     <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
 
       {/* ── Sidebar: always visible on md+, hidden on mobile ── */}
@@ -270,5 +279,6 @@ export default function ChatPage() {
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showPaywall && <PaywallModal requiredPlan="basic" currentPlan="free" onClose={() => setShowPaywall(false)} />}
     </div>
+    </>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { SEOHelmet } from '../components/SEOHelmet';
 import { mcqService, documentService } from '../services';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, CheckCircle, Trash2, X, Upload, AlertCircle, Loader2, Paperclip, Zap } from 'lucide-react';
@@ -406,6 +407,13 @@ export default function MCQPage() {
   };
 
   return (
+    <>
+      <SEOHelmet 
+        title="MCQ Generator - Create Custom Question Papers - EverlearnAI"
+        description="Generate AI-powered MCQs from any topic or document. Create custom question papers instantly for practice and exams."
+        url="https://everlearn.ai/mcq"
+        keywords="MCQ generator, question bank, multiple choice generator, practice questions"
+      />
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
@@ -488,5 +496,5 @@ export default function MCQPage() {
         )}
       </AnimatePresence>
     </div>
-  );
+    </>\n  );\n}
 }

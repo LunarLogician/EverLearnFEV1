@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { SEOHelmet } from '../components/SEOHelmet'
 import { examPaperService, documentService } from '../services'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -467,6 +468,14 @@ export default function ExamPaperPage() {
   }
 
   return (
+  return (
+    <>
+      <SEOHelmet 
+        title="Exam Paper Generator - Full Question Papers - EverlearnAI"
+        description="Generate complete exam papers with long answers and short answers. Perfect for final exam prep."
+        url="https://everlearn.ai/exam-papers"
+        keywords="exam paper generator, question paper, practice exam, full paper"
+      />
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Page heading */}
@@ -580,5 +589,4 @@ export default function ExamPaperPage() {
         )}
       </AnimatePresence>
     </div>
-  )
-}
+    </>\n  )\n}

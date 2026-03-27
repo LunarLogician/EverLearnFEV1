@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { SEOHelmet } from '../components/SEOHelmet'
 import { ArrowLeft, Mail, MessageSquare, FileText, Zap, HelpCircle } from 'lucide-react'
 
 const FAQS = [
@@ -40,6 +41,13 @@ export default function Support() {
   const navigate = useNavigate()
 
   return (
+    <>
+      <SEOHelmet 
+        title="Help & Support - EverlearnAI"
+        description="Find answers to common questions and get support for EverlearnAI features."
+        url="https://everlearn.ai/support"
+        keywords="help, faq, support, troubleshooting, documentation"
+      />
     <div className="bg-[#fdfcf8] min-h-screen text-gray-900">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-5 sm:px-12 py-4 flex items-center gap-4 bg-[#fdfcf8]">
@@ -130,5 +138,6 @@ export default function Support() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

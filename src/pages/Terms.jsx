@@ -1,10 +1,18 @@
 import { useNavigate } from 'react-router-dom'
+import { SEOHelmet } from '../components/SEOHelmet'
 import { ArrowLeft } from 'lucide-react'
 
 export default function Terms() {
   const navigate = useNavigate()
 
   return (
+    <>
+      <SEOHelmet 
+        title="Terms of Service - EverlearnAI"
+        description="Read the terms and conditions for using EverlearnAI study platform."
+        url="https://everlearn.ai/terms"
+        keywords="terms of service, terms and conditions, user agreement"
+      />
     <div className="bg-[#fdfcf8] min-h-screen text-gray-900">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-5 sm:px-12 py-4 flex items-center gap-4 bg-[#fdfcf8]">
@@ -157,5 +165,6 @@ export default function Terms() {
         </div>
       </footer>
     </div>
+    </>
   )
 }

@@ -1,10 +1,18 @@
 import { useNavigate } from 'react-router-dom'
+import { SEOHelmet } from '../components/SEOHelmet'
 import { ArrowLeft } from 'lucide-react'
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate()
 
   return (
+    <>
+      <SEOHelmet 
+        title="Privacy Policy - EverlearnAI"
+        description="Learn how EverlearnAI protects your data and privacy. Transparent privacy practices for students."
+        url="https://everlearn.ai/privacy"
+        keywords="privacy policy, data protection, terms of service"
+      />
     <div className="bg-[#fdfcf8] min-h-screen text-gray-900">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-5 sm:px-12 py-4 flex items-center gap-4 bg-[#fdfcf8]">
@@ -141,5 +149,6 @@ export default function PrivacyPolicy() {
         </div>
       </footer>
     </div>
+    </>
   )
 }
