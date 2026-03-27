@@ -1395,7 +1395,6 @@ export default function Dashboard() {
   ]
 
   return (
-  return (
     <>
       <SEOHelmet 
         title="Student Dashboard - Track Progress - EverlearnAI"
@@ -1403,7 +1402,7 @@ export default function Dashboard() {
         url="https://everlearn.ai/dashboard"
         keywords="dashboard, progress tracking, study stats, performance analytics"
       />
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col">
 
       {/* ── Top Navbar ── */}
       <header className="bg-[#111111] px-4 md:px-8 py-3.5 flex items-center justify-between flex-shrink-0 sticky top-0 z-20">

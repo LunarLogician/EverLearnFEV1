@@ -49,8 +49,7 @@ export default function ChatPage() {
       <div className="flex items-center justify-center min-h-screen bg-[#f8fafc]">
         <div className="h-10 w-10 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
       </div>
-    </>
-  )
+    )
   }
 
   const SidebarContent = () => (
@@ -201,7 +200,7 @@ export default function ChatPage() {
         url="https://everlearn.ai/chat"
         keywords="AI homework help, tutoring, exam prep, study assistant, Q&A"
       />
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+      <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
 
       {/* ── Sidebar: always visible on md+, hidden on mobile ── */}
       <div className="hidden md:flex w-64 flex-shrink-0 flex-col bg-[#111111] overflow-hidden">

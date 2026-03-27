@@ -13,7 +13,7 @@ export default function Contact() {
         url="https://everlearn.ai/contact"
         keywords="contact support, customer support, feedback, help center"
       />
-    <div className="bg-[#fdfcf8] min-h-screen text-gray-900">
+      <div className="bg-[#fdfcf8] min-h-screen text-gray-900">
       {/* Nav */}
       <nav className="border-b border-gray-100 px-5 sm:px-12 py-4 flex items-center gap-4 bg-[#fdfcf8]">
         <button

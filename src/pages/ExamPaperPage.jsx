@@ -468,7 +468,6 @@ export default function ExamPaperPage() {
   }
 
   return (
-  return (
     <>
       <SEOHelmet 
         title="Exam Paper Generator - Full Question Papers - EverlearnAI"
@@ -476,7 +475,7 @@ export default function ExamPaperPage() {
         url="https://everlearn.ai/exam-papers"
         keywords="exam paper generator, question paper, practice exam, full paper"
       />
-    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-50 p-4 sm:p-6">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         {/* Page heading */}
         <div className="mb-8">
@@ -589,4 +588,6 @@ export default function ExamPaperPage() {
         )}
       </AnimatePresence>
     </div>
-    </>\n  )\n}
+    </>
+  )
+}

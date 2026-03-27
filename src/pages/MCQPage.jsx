@@ -414,7 +414,7 @@ export default function MCQPage() {
         url="https://everlearn.ai/mcq"
         keywords="MCQ generator, question bank, multiple choice generator, practice questions"
       />
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 sm:p-6">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3">
@@ -496,5 +496,6 @@ export default function MCQPage() {
         )}
       </AnimatePresence>
     </div>
-    </>\n  );\n}
+    </>
+  );
 }
