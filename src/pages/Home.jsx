@@ -132,8 +132,8 @@ const TESTIMONIALS = [
 const PLANS = [
   {
     tier: 'Basic',
-    price: 'PKR 999',
-    usd: '~$3.50',
+    price: 'RS 399',
+    usd: '~$1.41',
     period: 'per month',
     desc: '200,000 AI tokens/month',
     features: [
@@ -151,11 +151,11 @@ const PLANS = [
   },
   {
     tier: 'Pro',
-    price: 'PKR 1,999',
-    usd: '~$7',
+    price: 'RS 899',
+    usd: '~$3.21',
     period: 'per month',
     badge: '5x More Tokens',
-    comparison: '5x tokens for 2x the price',
+    comparison: '5x tokens for 2.25x the price',
     desc: '1,000,000 AI tokens/month',
     features: [
       { text: 'Everything in Basic', ok: true },
@@ -169,7 +169,7 @@ const PLANS = [
     ],
     cta: 'Get Pro',
     featured: true,
-  },,
+  },
 ]
 
 const TOOL_PILLS = [
