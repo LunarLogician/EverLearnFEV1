@@ -71,7 +71,7 @@ export default function Terms() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">4. Free Tier & Subscriptions</h2>
             <ul className="list-disc pl-5 space-y-1.5">
               <li>New accounts receive 200 free tokens upon registration. Once exhausted, a paid plan is required to continue using AI features.</li>
-              <li>Paid plans (Basic, Pro) are billed monthly. Prices are displayed in PKR on the pricing page.</li>
+              <li>Paid plans (Basic: RS 399/month, Pro: RS 899/month) are billed monthly in Pakistani Rupees with USD equivalents shown.</li>
               <li>Subscriptions renew automatically unless cancelled before the next billing date.</li>
               <li>We reserve the right to change pricing with reasonable notice.</li>
             </ul>

@@ -204,7 +204,7 @@ const faqSchema = {
       "name": "How much does EverlearnAI cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Basic plan is PKR 999/month..."
+        "text": "Basic plan is RS 399/month (~$1.41), Pro plan is RS 899/month (~$3.21)..."
       }
     }
   ]

@@ -20,7 +20,7 @@ const PLANS = [
   {
     key: 'basic',
     name: 'Basic',
-    price: 999,
+    price: 399,
     badge: 'Popular',
     color: 'emerald',
     features: [
@@ -34,7 +34,7 @@ const PLANS = [
   {
     key: 'pro',
     name: 'Pro',
-    price: 1999,
+    price: 899,
     badge: 'Best Value',
     color: 'purple',
     features: [
