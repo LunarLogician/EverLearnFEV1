@@ -35,36 +35,69 @@ export const ChatProvider = ({ children }) => {
         },
       ]);
 
-      // Get response from API
-      const response = await chatService.sendMessage(message, documentId, image, activeChatId);
-      console.log('[ChatContext.sendMessage] API response:', response);
-
-      // Add assistant response
+      // Push an empty streaming placeholder for the assistant reply
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: response.message?.content, timestamp: new Date() },
+        { role: 'assistant', content: '', streaming: true, timestamp: new Date() },
       ]);
+
+      // Stream tokens — append each chunk to the last (assistant) message
+      const result = await chatService.sendMessageStream(
+        message,
+        documentId,
+        image,
+        activeChatId,
+        (chunk) => {
+          setMessages((prev) => {
+            const updated = [...prev]
+            const last = updated[updated.length - 1]
+            if (last?.role === 'assistant') {
+              updated[updated.length - 1] = { ...last, content: last.content + chunk }
+            }
+            return updated
+          })
+          // Hide the TypingIndicator once the first chunk arrives
+          setLoading(false)
+        }
+      );
+
+      // Mark streaming done on the placeholder
+      setMessages((prev) => {
+        const updated = [...prev]
+        const last = updated[updated.length - 1]
+        if (last?.role === 'assistant') {
+          updated[updated.length - 1] = { ...last, streaming: false }
+        }
+        return updated
+      })
 
       // Refresh token count from server after each message
       fetchChatCount();
 
       // Track the active chat session so subsequent messages append to same Chat doc
-      if (response.chatId) {
-        setActiveChatId(response.chatId);
+      if (result.chatId) {
+        setActiveChatId(String(result.chatId));
       }
 
-      return response;
+      return result;
     } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Failed to send message';
+      const errorMsg = err.message || 'Failed to send message';
       setError(errorMsg);
-      // Remove the user message if request failed
-      setMessages((prev) => prev.slice(0, -1));
-      console.error('[ChatContext.sendMessage] Error:', err?.response?.data || err.message);
+      // Remove both the user message and the empty assistant placeholder
+      setMessages((prev) => {
+        const trimmed = [...prev]
+        // Remove trailing assistant placeholder if it's empty / streaming
+        if (trimmed[trimmed.length - 1]?.streaming) trimmed.pop()
+        // Remove the user message
+        if (trimmed[trimmed.length - 1]?.role === 'user') trimmed.pop()
+        return trimmed
+      });
+      console.error('[ChatContext.sendMessage] Error:', err.message);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, [activeChatId]);
+  }, [activeChatId]); // fetchChatCount is declared later in the file; the closure captures it by ref
 
   const fetchChatCount = useCallback(async () => {
     setStatsLoading(true)

@@ -86,7 +86,8 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
           {messages.map((message, index) => (
             <MessageBubble key={index} message={message} userInitials={userInitials} />
           ))}
-          {loading && (
+          {/* Show typing indicator only when loading AND no streaming placeholder is already visible */}
+          {loading && !messages.some((m) => m.streaming) && (
             <motion.div
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}

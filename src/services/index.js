@@ -69,6 +69,83 @@ export const chatService = {
     }
   },
 
+  // Streaming variant — calls /chat/stream and fires callbacks as SSE events arrive.
+  // onChunk(text): called for each token chunk
+  // Returns a Promise that resolves with { chatId, tokenCount } on completion
+  // or rejects with an Error on stream-level or HTTP errors.
+  sendMessageStream: (message, documentId = null, image = null, chatId = null, onChunk) => {
+    const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+    const token = localStorage.getItem('token')
+    const payload = { message }
+    if (typeof documentId === 'string') payload.documentId = documentId
+    if (typeof image === 'string') payload.image = image
+    if (typeof chatId === 'string') payload.chatId = chatId
+
+    return new Promise(async (resolve, reject) => {
+      let response
+      try {
+        response = await fetch(`${API_BASE_URL}/chat/stream`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(payload),
+        })
+      } catch (networkErr) {
+        return reject(new Error('Network error — could not reach the server.'))
+      }
+
+      if (!response.ok) {
+        // Non-2xx before the stream starts — parse JSON error body
+        try {
+          const errData = await response.json()
+          const err = new Error(errData.message || 'Stream request failed')
+          if (errData.upgradeRequired) err.upgradeRequired = true
+          if (errData.requiredPlan) err.requiredPlan = errData.requiredPlan
+          return reject(err)
+        } catch {
+          return reject(new Error(`Stream request failed with status ${response.status}`))
+        }
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      const pump = async () => {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            // SSE lines are separated by \n\n
+            const parts = buffer.split('\n\n')
+            buffer = parts.pop() // keep incomplete trailing part
+            for (const part of parts) {
+              const line = part.trim()
+              if (!line.startsWith('data:')) continue
+              let json
+              try { json = JSON.parse(line.slice(5).trim()) } catch { continue }
+              if (json.type === 'chunk') {
+                onChunk(json.text)
+              } else if (json.type === 'done') {
+                resolve({ chatId: json.chatId, tokenCount: json.tokenCount })
+              } else if (json.type === 'error') {
+                reject(new Error(json.message || 'Stream error'))
+              }
+            }
+          }
+        } catch (readErr) {
+          reject(new Error('Stream read error: ' + readErr.message))
+        }
+      }
+
+      pump()
+    })
+  },
+
+
   getChatCount: async () => {
     const response = await api.get('/chat/count')
     return response.data

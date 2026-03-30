@@ -1,0 +1,16 @@
+/* Blinking cursor shown while an assistant message is still streaming */
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #059669; /* emerald-600 — matches the app theme */
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  animation: blink-cursor 0.7s step-end infinite;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}

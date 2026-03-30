@@ -5,6 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Copy, Check, ExternalLink } from 'lucide-react'
 import { useState, useCallback } from 'react'
+import '../styles/streaming.css'
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false)
@@ -149,6 +150,7 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
               >
                 {message.content}
               </ReactMarkdown>
+              {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
             </div>
           </div>
         )}
