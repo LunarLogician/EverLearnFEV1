@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useCallback } from 'react'
+import { createContext, useState, useContext, useCallback, useRef } from 'react'
 import { chatService } from '../services/index'
 
 const ChatContext = createContext()
@@ -16,6 +16,32 @@ export const ChatProvider = ({ children }) => {
   const [hasUnlimitedChats, setHasUnlimitedChats] = useState(false)
   const [activeChatId, setActiveChatId] = useState(null)
   const [statsLoading, setStatsLoading] = useState(true)
+
+  // Character-drip queue — chunks from the stream are split into individual
+  // characters and drained one at a time so the UI renders char-by-char.
+  const dripQueueRef = useRef([])       // pending characters
+  const dripIntervalRef = useRef(null)  // setInterval handle
+
+  const startDrip = useCallback(() => {
+    if (dripIntervalRef.current) return  // already running
+    dripIntervalRef.current = setInterval(() => {
+      if (dripQueueRef.current.length === 0) {
+        clearInterval(dripIntervalRef.current)
+        dripIntervalRef.current = null
+        return
+      }
+      // Drain up to 2 chars per tick — feels natural without being too slow
+      const chars = dripQueueRef.current.splice(0, 2).join('')
+      setMessages((prev) => {
+        const updated = [...prev]
+        const last = updated[updated.length - 1]
+        if (last?.role === 'assistant') {
+          updated[updated.length - 1] = { ...last, content: last.content + chars }
+        }
+        return updated
+      })
+    }, 16) // ~16ms per tick ≈ 60fps, 2 chars/tick ≈ 120 chars/sec
+  }, [])
 
   const sendMessage = useCallback(async (message, documentId = null, docInfo = null, image = null) => {
     console.log('[ChatContext.sendMessage] Called with:', { message, documentId, docInfo, image });
@@ -41,25 +67,32 @@ export const ChatProvider = ({ children }) => {
         { role: 'assistant', content: '', streaming: true, timestamp: new Date() },
       ]);
 
-      // Stream tokens — append each chunk to the last (assistant) message
+      // Reset drip queue for this new response
+      dripQueueRef.current = []
+
+      // Stream tokens — push each chunk's characters into the drip queue
       const result = await chatService.sendMessageStream(
         message,
         documentId,
         image,
         activeChatId,
         (chunk) => {
-          setMessages((prev) => {
-            const updated = [...prev]
-            const last = updated[updated.length - 1]
-            if (last?.role === 'assistant') {
-              updated[updated.length - 1] = { ...last, content: last.content + chunk }
-            }
-            return updated
-          })
+          dripQueueRef.current.push(...chunk.split(''))
+          startDrip()
           // Hide the TypingIndicator once the first chunk arrives
           setLoading(false)
         }
       );
+
+      // Wait for the drip queue to fully drain before marking streaming done
+      await new Promise((resolve) => {
+        const check = setInterval(() => {
+          if (dripQueueRef.current.length === 0 && !dripIntervalRef.current) {
+            clearInterval(check)
+            resolve()
+          }
+        }, 32)
+      })
 
       // Mark streaming done on the placeholder
       setMessages((prev) => {
@@ -83,6 +116,10 @@ export const ChatProvider = ({ children }) => {
     } catch (err) {
       const errorMsg = err.message || 'Failed to send message';
       setError(errorMsg);
+      // Stop the drip and clear the queue so stale characters don't appear
+      clearInterval(dripIntervalRef.current)
+      dripIntervalRef.current = null
+      dripQueueRef.current = []
       // Remove both the user message and the empty assistant placeholder
       setMessages((prev) => {
         const trimmed = [...prev]
