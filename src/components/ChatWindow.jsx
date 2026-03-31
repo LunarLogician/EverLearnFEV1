@@ -14,7 +14,7 @@ const SUGGESTIONS = [
 
 export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitReached }) {
   const { user } = useAuth()
-  const { messages, loading, sendMessage, chatCount } = useChat()
+  const { messages, loading, historyLoading, sendMessage, chatCount } = useChat()
   const messagesEndRef = useRef(null)
   const [visibleCount, setVisibleCount] = useState(50)
 
@@ -37,7 +37,11 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
 
   return (
     <div className="flex-1 overflow-y-auto flex flex-col chat-scroll">
-      {messages.length === 0 ? (
+      {historyLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="h-8 w-8 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
+        </div>
+      ) : messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}

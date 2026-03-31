@@ -158,8 +158,13 @@ export const chatService = {
     return response.data
   },
 
-  getChats: async () => {
-    const response = await api.get('/chat/history')
+  getChats: async (page = 1, limit = 20) => {
+    const response = await api.get(`/chat/history?page=${page}&limit=${limit}`)
+    return response.data
+  },
+
+  getChatById: async (chatId) => {
+    const response = await api.get(`/chat/${chatId}`)
     return response.data
   },
 

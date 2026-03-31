@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useCallback, useRef } from 'react'
+import { createContext, useState, useEffect, useContext, useCallback, useRef } from 'react'
 import { chatService } from '../services/index'
 
 const ChatContext = createContext()
@@ -39,7 +39,12 @@ function clearChatCache() {
 
 export const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([])
-  const [recentChats, setRecentChats] = useState(() => getChatCache() || [])
+  const [recentChats, setRecentChats] = useState(() => {
+    const c = getChatCache()
+    return c?.chats || (Array.isArray(c) ? c : [])
+  })
+  const [chatsPage, setChatsPage] = useState(1)
+  const [chatsHasMore, setChatsHasMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -225,46 +230,78 @@ export const ChatProvider = ({ children }) => {
     }
   }, [])
 
-  const fetchRecentChats = useCallback(async (forceRefresh = false) => {
+  const fetchRecentChats = useCallback(async (forceRefresh = false, page = 1) => {
     try {
-      // 1. Show cached data instantly (stale-while-revalidate)
-      const cached = getChatCache()
-      if (cached?.chats) setRecentChats(cached.chats)
+      // 1. Show cached page-1 data instantly (stale-while-revalidate)
+      if (page === 1) {
+        const cached = getChatCache()
+        const cachedChats = cached?.chats || (Array.isArray(cached) ? cached : null)
+        if (cachedChats) setRecentChats(cachedChats)
+      }
 
-      // 2. Refresh in background if stale, forced, or no cache
-      if (forceRefresh || !cached || isChatCacheStale()) {
-        const data = await chatService.getChats()
-        setChatCache(data)
-        if (data?.chats) setRecentChats(data.chats)
+      // 2. Refresh from API if stale, forced, or no cache
+      if (forceRefresh || !getChatCache() || isChatCacheStale() || page > 1) {
+        const data = await chatService.getChats(page, 20)
+        if (page === 1) {
+          const chats = data?.chats || []
+          setChatCache({ chats, ts: Date.now() })
+          setRecentChats(chats)
+        } else {
+          // Append next page
+          setRecentChats(prev => [...prev, ...(data?.chats || [])])
+        }
+        setChatsPage(page)
+        setChatsHasMore(data?.pagination?.hasMore || false)
         return data
       }
-      return cached
+      return getChatCache()
     } catch { /* silently ignore */ }
   }, [])
 
-  const loadHistory = useCallback(async (forceRefresh = false) => {
+  const loadMoreChats = useCallback(() => {
+    fetchRecentChats(false, chatsPage + 1)
+  }, [chatsPage, fetchRecentChats])
+
+  const recentChatsRef = useRef([])
+  useEffect(() => { recentChatsRef.current = recentChats }, [recentChats])
+
+  const loadHistory = useCallback(async (chatId) => {
+    if (!chatId) return
+    const id = String(chatId)
+
+    // 1. Try recentChats first — getChats() already returns messages,
+    //    so most clicks cost zero API calls
+    const cached = recentChatsRef.current.find(
+      c => String(c._id) === id
+    )
+    if (cached?.messages?.length > 0) {
+      const msgs = cached.messages.map(m => ({
+        role: m.role,
+        content: m.content,
+        image: m.image || null,
+        timestamp: new Date(m.timestamp),
+      }))
+      setMessages(msgs)
+      setActiveChatId(id)
+      return
+    }
+
+    // 2. Fall back to individual fetch (for paginated/older chats)
     setHistoryLoading(true)
     try {
-      let data = getChatCache()
-      if (!data || forceRefresh || isChatCacheStale()) {
-        data = await chatService.getChats()
-        setChatCache(data)
-      }
-      if (data?.chats) setRecentChats(data.chats)
-      const allMessages = (data?.chats || [])
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-        .flatMap(chat =>
-          chat.messages.map(m => ({
-            role: m.role,
-            content: m.content,
-            image: m.image || null,
-            timestamp: new Date(m.timestamp),
-          }))
-        )
-      setMessages(allMessages)
-      return data
-    } catch (err) {
-
+      const data = await chatService.getChatById(chatId)
+      // Support multiple backend response shapes
+      const rawMsgs = data?.messages || data?.chat?.messages || []
+      const msgs = rawMsgs.map(m => ({
+        role: m.role,
+        content: m.content,
+        image: m.image || null,
+        timestamp: new Date(m.timestamp),
+      }))
+      setMessages(msgs)
+      setActiveChatId(id)
+    } catch {
+      setError('Failed to load chat. Please try again.')
     } finally {
       setHistoryLoading(false)
     }
@@ -308,10 +345,12 @@ export const ChatProvider = ({ children }) => {
         hasUnlimitedChats,
         activeChatId,
         recentChats,
+        chatsHasMore,
         sendMessage,
         stopGenerating,
         fetchChatCount,
         fetchRecentChats,
+        loadMoreChats,
         loadHistory,
         resetChat,
         deleteChat,

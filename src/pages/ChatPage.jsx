@@ -14,7 +14,7 @@ import StudyTimer from '../components/StudyTimer'
 export default function ChatPage() {
   const navigate = useNavigate()
   const { user, loading: authLoading, logout, streak } = useAuth()
-  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats, recentChats, fetchRecentChats } = useChat()
+  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats, recentChats, fetchRecentChats, chatsHasMore, loadMoreChats } = useChat()
 
   const [showPaywall, setShowPaywall] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -120,10 +120,11 @@ export default function ChatPage() {
             {recentChats.length === 0 ? (
               <p className="text-white/25 text-xs px-1">No chats yet. Start a new session!</p>
             ) : (
-              recentChats.slice(0, 12).map((chat) => (
+              <>
+                {recentChats.map((chat) => (
                 <div
                   key={chat._id}
-                  onClick={() => { loadHistory(); setSidebarOpen(false) }}
+                  onClick={() => { loadHistory(chat._id); setSidebarOpen(false) }}
                   className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] cursor-pointer transition-all mb-0.5"
                 >
                   <MessageSquare size={13} className="flex-shrink-0" />
@@ -139,7 +140,16 @@ export default function ChatPage() {
                     <Trash2 size={11} />
                   </button>
                 </div>
-              ))
+              ))}
+              {chatsHasMore && (
+                <button
+                  onClick={loadMoreChats}
+                  className="w-full text-center text-white/30 hover:text-white/60 text-xs py-2 transition-colors"
+                >
+                  Load more
+                </button>
+              )}
+              </>
             )}
           </>
         ) : (
