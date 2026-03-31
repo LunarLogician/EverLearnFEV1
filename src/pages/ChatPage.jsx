@@ -10,6 +10,7 @@ import PaywallModal from '../components/PaywallModal'
 import { chatService } from '../services'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText, Trash2 } from 'lucide-react'
+import StudyTimer from '../components/StudyTimer'
 
 export default function ChatPage() {
   const navigate = useNavigate()
@@ -279,6 +280,7 @@ export default function ChatPage() {
 
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
       {showPaywall && <PaywallModal requiredPlan="basic" currentPlan="free" onClose={() => setShowPaywall(false)} />}
+      <StudyTimer />
     </div>
     </>
   )
