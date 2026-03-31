@@ -362,10 +362,18 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
   );
 }
 
+// ── MCQ cache helpers ─────────────────────────────────────────────────────────
+const MCQ_TTL = 5 * 60 * 1000
+const mcqCacheKey = (uid) => `ev_mcqs_${uid}`
+const getMCQCache = (uid) => { try { const r = localStorage.getItem(mcqCacheKey(uid)); if (!r) return null; return JSON.parse(r).data } catch { return null } }
+const setMCQCache = (uid, data) => { try { localStorage.setItem(mcqCacheKey(uid), JSON.stringify({ data, ts: Date.now() })) } catch {} }
+const isMCQCacheStale = (uid) => { try { const r = localStorage.getItem(mcqCacheKey(uid)); if (!r) return true; return Date.now() - JSON.parse(r).ts > MCQ_TTL } catch { return true } }
+const clearMCQCache = (uid) => { try { localStorage.removeItem(mcqCacheKey(uid)) } catch {} }
+
 // ── MCQ Page ──────────────────────────────────────────────────────────────────
 export default function MCQPage() {
   const { user } = useAuth();
-  const [mcqs, setMcqs] = useState([]);
+  const [mcqs, setMcqs] = useState(() => getMCQCache(user?.id || user?._id) || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showGenerator, setShowGenerator] = useState(false);
@@ -374,11 +382,17 @@ export default function MCQPage() {
 
   useEffect(() => { fetchMCQs(); }, []);
 
-  const fetchMCQs = async () => {
+  const fetchMCQs = async (forceRefresh = false) => {
+    const uid = user?.id || user?._id;
+    const cached = getMCQCache(uid);
+    if (cached) setMcqs(cached);
+    if (!forceRefresh && cached && !isMCQCacheStale(uid)) return;
     setLoading(true); setError(null);
     try {
       const data = await mcqService.getMCQs();
-      setMcqs(data.mcqs || []);
+      const list = data.mcqs || [];
+      setMcqs(list);
+      setMCQCache(uid, list);
     } catch (err) {
       setError(err.message);
     }
@@ -389,8 +403,11 @@ export default function MCQPage() {
     if (!confirm('Are you sure you want to delete this MCQ?')) return;
     setDeletingId(mcqId);
     try {
+      const uid = user?.id || user?._id;
       await mcqService.deleteMCQ(mcqId);
-      setMcqs(mcqs.filter(m => m._id !== mcqId));
+      const updated = mcqs.filter(m => m._id !== mcqId);
+      setMcqs(updated);
+      setMCQCache(uid, updated);
     } catch (err) {
       setError(err.message);
     }
@@ -480,7 +497,7 @@ export default function MCQPage() {
         {showGenerator && (
           <MCQGeneratorModal
             onClose={() => setShowGenerator(false)}
-            onCreated={() => fetchMCQs()}
+            onCreated={() => fetchMCQs(true)}
             onStartMCQ={(mcq) => setActiveMCQ(mcq)}
           />
         )}

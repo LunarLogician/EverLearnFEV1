@@ -419,10 +419,18 @@ export function ExamPaperViewModal({ paper, onClose }) {
   )
 }
 
+// ── Exam Paper cache helpers ──────────────────────────────────────────────────
+const EXAM_TTL = 5 * 60 * 1000
+const examCacheKey = (uid) => `ev_exams_${uid}`
+const getExamCache = (uid) => { try { const r = localStorage.getItem(examCacheKey(uid)); if (!r) return null; return JSON.parse(r).data } catch { return null } }
+const setExamCache = (uid, data) => { try { localStorage.setItem(examCacheKey(uid), JSON.stringify({ data, ts: Date.now() })) } catch {} }
+const isExamCacheStale = (uid) => { try { const r = localStorage.getItem(examCacheKey(uid)); if (!r) return true; return Date.now() - JSON.parse(r).ts > EXAM_TTL } catch { return true } }
+const clearExamCache = (uid) => { try { localStorage.removeItem(examCacheKey(uid)) } catch {} }
+
 // ── Exam Paper Page ────────────────────────────────────────────────────────────
 export default function ExamPaperPage() {
   const { user } = useAuth()
-  const [examPapers, setExamPapers] = useState([])
+  const [examPapers, setExamPapers] = useState(() => getExamCache(user?.id || user?._id) || [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showGenerator, setShowGenerator] = useState(false)
@@ -431,12 +439,18 @@ export default function ExamPaperPage() {
 
   useEffect(() => { fetchExamPapers() }, [])
 
-  const fetchExamPapers = async () => {
+  const fetchExamPapers = async (forceRefresh = false) => {
+    const uid = user?.id || user?._id
+    const cached = getExamCache(uid)
+    if (cached) setExamPapers(cached)
+    if (!forceRefresh && cached && !isExamCacheStale(uid)) return
     setLoading(true)
     setError(null)
     try {
       const data = await examPaperService.list()
-      setExamPapers(data.exams || data.examPapers || data.papers || [])
+      const list = data.exams || data.examPapers || data.papers || []
+      setExamPapers(list)
+      setExamCache(uid, list)
     } catch (err) {
       setError(err.response?.data?.message || err.message)
     } finally {
@@ -458,8 +472,11 @@ export default function ExamPaperPage() {
     if (!window.confirm('Delete this exam paper? This cannot be undone.')) return
     setDeletingId(examId)
     try {
+      const uid = user?.id || user?._id
       await examPaperService.deleteExamPaper(examId)
-      setExamPapers(prev => prev.filter(p => p._id !== examId))
+      const updated = examPapers.filter(p => p._id !== examId)
+      setExamPapers(updated)
+      setExamCache(uid, updated)
     } catch (err) {
       setError(err.response?.data?.message || err.message)
     } finally {
@@ -573,7 +590,7 @@ export default function ExamPaperPage() {
         {showGenerator && (
           <ExamPaperGeneratorModal
             onClose={() => setShowGenerator(false)}
-            onCreated={fetchExamPapers}
+            onCreated={() => fetchExamPapers(true)}
             onView={handleViewPaper}
           />
         )}

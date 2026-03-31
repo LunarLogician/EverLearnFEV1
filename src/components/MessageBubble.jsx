@@ -1,10 +1,19 @@
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Copy, Check, ExternalLink } from 'lucide-react'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, lazy, Suspense } from 'react'
+
+const LazyCodeBlock = lazy(() =>
+  Promise.all([
+    import('react-syntax-highlighter').then(m => m.Prism),
+    import('react-syntax-highlighter/dist/esm/styles/prism').then(m => m.oneLight)
+  ]).then(([Prism, oneLight]) => ({
+    default: ({ language, children }) => (
+      <Prism style={oneLight} language={language} PreTag="div">{children}</Prism>
+    )
+  }))
+)
 import '../styles/streaming.css'
 
 function CopyButton({ text }) {
@@ -121,15 +130,9 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
                           <span className="text-[11px] text-slate-400 font-mono">{lang || 'code'}</span>
                           <CopyButton text={codeStr} />
                         </div>
-                        <SyntaxHighlighter
-                          language={lang || 'text'}
-                          style={oneLight}
-                          customStyle={{ margin: 0, borderRadius: 0, fontSize: '0.78rem', padding: '1rem' }}
-                          showLineNumbers={codeStr.split('\n').length > 5}
-                          wrapLongLines
-                        >
-                          {codeStr}
-                        </SyntaxHighlighter>
+                        <Suspense fallback={<pre className="m-0 p-4 bg-slate-50 text-[0.78rem] overflow-x-auto">{codeStr}</pre>}>
+                          <LazyCodeBlock language={lang || 'text'}>{codeStr}</LazyCodeBlock>
+                        </Suspense>
                       </div>
                     )
                   },
