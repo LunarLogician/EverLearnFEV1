@@ -31,7 +31,7 @@ export const ChatProvider = ({ children }) => {
         return
       }
       // Drain up to 2 chars per tick — feels natural without being too slow
-      const chars = dripQueueRef.current.splice(0, 30).join('')
+      const chars = dripQueueRef.current.splice(0, 60).join('')
       setMessages((prev) => {
         const updated = [...prev]
         const last = updated[updated.length - 1]
