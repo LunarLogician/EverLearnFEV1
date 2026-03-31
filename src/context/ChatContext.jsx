@@ -31,7 +31,7 @@ export const ChatProvider = ({ children }) => {
         return
       }
       // Drain up to 2 chars per tick — feels natural without being too slow
-      const chars = dripQueueRef.current.splice(0, 2).join('')
+      const chars = dripQueueRef.current.splice(0, 10).join('')
       setMessages((prev) => {
         const updated = [...prev]
         const last = updated[updated.length - 1]
@@ -40,7 +40,7 @@ export const ChatProvider = ({ children }) => {
         }
         return updated
       })
-    }, 16) // ~16ms per tick ≈ 60fps, 2 chars/tick ≈ 120 chars/sec
+    }, 12) // ~12ms per tick, 5 chars/tick ≈ 300 chars/sec (ChatGPT-speed feel)
   }, [])
 
   const sendMessage = useCallback(async (message, documentId = null, docInfo = null, image = null) => {
