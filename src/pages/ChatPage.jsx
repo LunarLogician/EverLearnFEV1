@@ -7,7 +7,6 @@ import AuthModal from '../components/AuthModal'
 import ChatWindow from '../components/ChatWindow'
 import ChatInput from '../components/ChatInput'
 import PaywallModal from '../components/PaywallModal'
-import { chatService } from '../services'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText, Trash2 } from 'lucide-react'
 import StudyTimer from '../components/StudyTimer'
@@ -15,11 +14,10 @@ import StudyTimer from '../components/StudyTimer'
 export default function ChatPage() {
   const navigate = useNavigate()
   const { user, loading: authLoading, logout, streak } = useAuth()
-  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats } = useChat()
+  const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats, recentChats, fetchRecentChats } = useChat()
 
   const [showPaywall, setShowPaywall] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const [recentChats, setRecentChats] = useState([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const prevEmailRef = useRef(undefined)
 
@@ -33,15 +31,12 @@ export default function ChatPage() {
       fetchChatCount()
       // Always start a new chat — fetch sidebar data without loading old messages
       resetChat()
-      chatService.getChats().then(data => {
-        if (data?.chats) setRecentChats(data.chats)
-      }).catch(() => {})
+      fetchRecentChats()
     } else {
       prevEmailRef.current = undefined
       resetChat()
-      setRecentChats([])
     }
-  }, [user, fetchChatCount, resetChat])
+  }, [user, fetchChatCount, resetChat, fetchRecentChats])
 
   const userInitials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -81,7 +76,7 @@ export default function ChatPage() {
       {user && (
         <div className="px-4 pt-4 space-y-2">
           <button
-            onClick={() => { resetChat(); chatService.getChats().then(data => { if (data?.chats) setRecentChats(data.chats) }).catch(() => {}); setSidebarOpen(false) }}
+            onClick={() => { resetChat(); fetchRecentChats(); setSidebarOpen(false) }}
             className="w-full flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-900 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors"
           >
             <Plus size={15} />
@@ -115,7 +110,6 @@ export default function ChatPage() {
               <button
                 onClick={async () => {
                   await deleteAllChats()
-                  setRecentChats([])
                 }}
                 className="w-full flex items-center gap-1.5 px-3 py-1.5 mb-2 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-white/[0.06] text-xs font-medium transition-colors"
               >
@@ -138,7 +132,6 @@ export default function ChatPage() {
                     onClick={async (e) => {
                       e.stopPropagation()
                       await deleteChat(chat._id)
-                      setRecentChats((prev) => prev.filter((c) => c._id !== chat._id))
                     }}
                     className="opacity-0 group-hover:opacity-100 p-1 text-white/30 hover:text-red-400 transition-all rounded flex-shrink-0"
                     title="Delete chat"

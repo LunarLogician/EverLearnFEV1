@@ -1122,6 +1122,25 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
     </div>
   );
 }
+// ── Skeleton Card ────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="bg-white border border-gray-100 rounded-2xl p-4 animate-pulse">
+      <div className="flex items-start gap-3">
+        <div className="h-9 w-9 rounded-xl bg-slate-200 flex-shrink-0" />
+        <div className="flex-1 pr-5">
+          <div className="h-3.5 bg-slate-200 rounded w-3/4 mb-2" />
+          <div className="h-2.5 bg-slate-100 rounded w-1/2" />
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between">
+        <div className="h-2.5 bg-slate-100 rounded w-20" />
+        <div className="h-2.5 bg-slate-100 rounded w-16" />
+      </div>
+    </div>
+  )
+}
+
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -1161,7 +1180,27 @@ export default function Dashboard() {
     if (user) loadData()
   }, [user])
 
-  const loadData = async () => {
+  const getCacheKey = () => `dashboard_data_${user?._id || ''}`
+  const invalidateCache = () => { try { localStorage.removeItem(getCacheKey()) } catch {} }
+
+  const loadData = async (force = false) => {
+    if (!force) {
+      try {
+        const cached = localStorage.getItem(getCacheKey())
+        if (cached) {
+          const { data, ts } = JSON.parse(cached)
+          if (Date.now() - ts < 5 * 60 * 1000) {
+            setQuizzes(data.quizzes || [])
+            setFlashcardSets(data.flashcards || [])
+            setMcqs(data.mcqs || [])
+            setExamPapers(data.examPapers || [])
+            setUserPlan(data.userPlan || 'free')
+            fetchChatCount()
+            return
+          }
+        }
+      } catch {}
+    }
     setDataLoading(true)
     fetchChatCount()
     try {
@@ -1172,11 +1211,22 @@ export default function Dashboard() {
         subscriptionService.getSubscription().catch(() => null),
         examPaperService.list().catch(() => ({})),
       ])
-      setQuizzes(qData.quizzes || [])
-      setFlashcardSets(fData.flashcards || [])
-      setMcqs(mData.mcqs || [])
-      setExamPapers(epData.exams || epData.examPapers || epData.papers || [])
-      setUserPlan(subData?.subscription?.plan || 'free')
+      const quizzes = qData.quizzes || []
+      const flashcards = fData.flashcards || []
+      const mcqs = mData.mcqs || []
+      const examPapers = epData.exams || epData.examPapers || epData.papers || []
+      const userPlan = subData?.subscription?.plan || 'free'
+      setQuizzes(quizzes)
+      setFlashcardSets(flashcards)
+      setMcqs(mcqs)
+      setExamPapers(examPapers)
+      setUserPlan(userPlan)
+      try {
+        localStorage.setItem(getCacheKey(), JSON.stringify({
+          data: { quizzes, flashcards, mcqs, examPapers, userPlan },
+          ts: Date.now(),
+        }))
+      } catch {}
     } catch { /* silently ignore */ }
     finally { setDataLoading(false) }
   }
@@ -1197,6 +1247,7 @@ export default function Dashboard() {
     try {
       await flashcardService.deleteFlashcardSet(setId)
       setFlashcardSets(prev => prev.filter(s => s._id !== setId))
+      invalidateCache()
     } catch { /* ignore */ }
     finally { setDeletingFlashSetId(null) }
   }
@@ -1208,6 +1259,7 @@ export default function Dashboard() {
     try {
       await quizService.deleteQuiz(quizId)
       setQuizzes(prev => prev.filter(q => q._id !== quizId))
+      invalidateCache()
     } catch { /* ignore */ }
     finally { setDeletingQuizId(null) }
   }
@@ -1219,6 +1271,7 @@ export default function Dashboard() {
     try {
       await mcqService.deleteMCQ(mcqId)
       setMcqs(prev => prev.filter(m => m._id !== mcqId))
+      invalidateCache()
     } catch { /* ignore */ }
     finally { setDeletingMcqId(null) }
   }
@@ -1241,6 +1294,7 @@ export default function Dashboard() {
     try {
       await examPaperService.deleteExamPaper(examId)
       setExamPapers(prev => prev.filter(p => p._id !== examId))
+      invalidateCache()
     } catch { /* ignore */ }
     finally { setDeletingExamPaperId(null) }
   }
@@ -1545,7 +1599,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Quizzes */}
-        {user && quizzes.length > 0 && (
+        {user && (quizzes.length > 0 || dataLoading) && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
@@ -1559,7 +1613,9 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {quizzes.slice(0, 6).map((quiz) => (
+              {dataLoading && quizzes.length === 0
+                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
+                : quizzes.slice(0, 6).map((quiz) => (
                 <div
                   key={quiz._id}
                   onClick={() => !loadingQuizId && !deletingQuizId && openQuiz(quiz)}
@@ -1602,7 +1658,7 @@ export default function Dashboard() {
         )}
 
         {/* Recent Flashcard Sets */}
-        {user && flashcardSets.length > 0 && (
+        {user && (flashcardSets.length > 0 || dataLoading) && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
@@ -1613,7 +1669,9 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {flashcardSets.slice(0, 6).map((set) => (
+              {dataLoading && flashcardSets.length === 0
+                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
+                : flashcardSets.slice(0, 6).map((set) => (
                 <div
                   key={set._id}
                   onClick={() => !deletingFlashSetId && openFlashcardSet(set._id)}
@@ -1656,7 +1714,7 @@ export default function Dashboard() {
         )}
 
         {/* Recent MCQs */}
-        {user && mcqs.length > 0 && (
+        {user && (mcqs.length > 0 || dataLoading) && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
@@ -1667,7 +1725,9 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {mcqs.slice(0, 6).map((mcq) => (
+              {dataLoading && mcqs.length === 0
+                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
+                : mcqs.slice(0, 6).map((mcq) => (
                 <div
                   key={mcq._id}
                   onClick={() => !deletingMcqId && !loadingMCQId && openMCQ(mcq)}
@@ -1798,7 +1858,7 @@ export default function Dashboard() {
         )}
 
         {/* Recent Exam Papers */}
-        {user && examPapers.length > 0 && (
+        {user && (examPapers.length > 0 || dataLoading) && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-8">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
@@ -1809,7 +1869,9 @@ export default function Dashboard() {
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {examPapers.slice(0, 6).map((paper) => (
+              {dataLoading && examPapers.length === 0
+                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
+                : examPapers.slice(0, 6).map((paper) => (
                 <div
                   key={paper._id}
                   onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)}
@@ -1876,7 +1938,7 @@ export default function Dashboard() {
         {showQuizModal && (
           <QuizModal
             onClose={() => setShowQuizModal(false)}
-            onCreated={loadData}
+            onCreated={() => loadData(true)}
             onStartQuiz={(quiz) => { setShowQuizModal(false); openQuiz(quiz) }}
           />
         )}
@@ -1889,7 +1951,7 @@ export default function Dashboard() {
         {showMCQModal && (
           <MCQGeneratorModal
             onClose={() => setShowMCQModal(false)}
-            onCreated={loadData}
+            onCreated={() => loadData(true)}
             onStartMCQ={(mcq) => { setShowMCQModal(false); openMCQ(mcq) }}
           />
         )}
@@ -1902,7 +1964,7 @@ export default function Dashboard() {
         {showFlashcardModal && (
           <FlashcardGeneratorModal
             onClose={() => setShowFlashcardModal(false)}
-            onCreated={loadData}
+            onCreated={() => loadData(true)}
             onStudyNow={(set) => { setShowFlashcardModal(false); setActiveFlashSet(set) }}
           />
         )}
@@ -1915,7 +1977,7 @@ export default function Dashboard() {
         {showExamPaperModal && (
           <ExamPaperGeneratorModal
             onClose={() => setShowExamPaperModal(false)}
-            onCreated={loadData}
+            onCreated={() => loadData(true)}
             onView={(paper) => { setShowExamPaperModal(false); setActiveExamPaper(paper) }}
           />
         )}

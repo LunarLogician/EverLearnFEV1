@@ -4,8 +4,42 @@ import { chatService } from '../services/index'
 const ChatContext = createContext()
 // FREE_LIMIT removed
 
+// ─── Chat history cache (localStorage, stale-while-revalidate) ───────────────
+const CHAT_CACHE_KEY = 'ev_chat_cache'
+const CHAT_CACHE_TTL = 5 * 60 * 1000 // 5 minutes — only used for background refresh decision
+
+// Always returns cached data regardless of age (stale is fine to show instantly)
+function getChatCache() {
+  try {
+    const raw = localStorage.getItem(CHAT_CACHE_KEY)
+    if (!raw) return null
+    const { data } = JSON.parse(raw)
+    return data || null
+  } catch { return null }
+}
+
+// Returns true only when background refresh is needed
+function isChatCacheStale() {
+  try {
+    const raw = localStorage.getItem(CHAT_CACHE_KEY)
+    if (!raw) return true
+    const { ts } = JSON.parse(raw)
+    return Date.now() - ts > CHAT_CACHE_TTL
+  } catch { return true }
+}
+
+function setChatCache(data) {
+  try { localStorage.setItem(CHAT_CACHE_KEY, JSON.stringify({ data, ts: Date.now() })) } catch {}
+}
+
+function clearChatCache() {
+  localStorage.removeItem(CHAT_CACHE_KEY)
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 export const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([])
+  const [recentChats, setRecentChats] = useState(() => getChatCache() || [])
   const [loading, setLoading] = useState(false)
   const [historyLoading, setHistoryLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -131,6 +165,9 @@ export const ChatProvider = ({ children }) => {
         return updated
       })
 
+      // Invalidate chat cache so sidebar reflects the new message on next load
+      clearChatCache()
+
       // Refresh token count from server after each message (skip if aborted)
       if (!result?.aborted) fetchChatCount();
 
@@ -188,11 +225,33 @@ export const ChatProvider = ({ children }) => {
     }
   }, [])
 
-  const loadHistory = useCallback(async () => {
+  const fetchRecentChats = useCallback(async (forceRefresh = false) => {
+    try {
+      // 1. Show cached data instantly (stale-while-revalidate)
+      const cached = getChatCache()
+      if (cached?.chats) setRecentChats(cached.chats)
+
+      // 2. Refresh in background if stale, forced, or no cache
+      if (forceRefresh || !cached || isChatCacheStale()) {
+        const data = await chatService.getChats()
+        setChatCache(data)
+        if (data?.chats) setRecentChats(data.chats)
+        return data
+      }
+      return cached
+    } catch { /* silently ignore */ }
+  }, [])
+
+  const loadHistory = useCallback(async (forceRefresh = false) => {
     setHistoryLoading(true)
     try {
-      const data = await chatService.getChats()
-      const allMessages = (data.chats || [])
+      let data = getChatCache()
+      if (!data || forceRefresh || isChatCacheStale()) {
+        data = await chatService.getChats()
+        setChatCache(data)
+      }
+      if (data?.chats) setRecentChats(data.chats)
+      const allMessages = (data?.chats || [])
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
         .flatMap(chat =>
           chat.messages.map(m => ({
@@ -213,13 +272,16 @@ export const ChatProvider = ({ children }) => {
 
   const deleteChat = useCallback(async (chatId) => {
     await chatService.deleteChat(chatId)
-    // If the deleted chat is the active one, reset the view
+    clearChatCache()
+    setRecentChats((prev) => prev.filter((c) => c._id !== chatId))
     setActiveChatId((prev) => (prev === chatId ? null : prev))
   }, [])
 
   const deleteAllChats = useCallback(async () => {
     await chatService.deleteAllChats()
+    clearChatCache()
     setMessages([])
+    setRecentChats([])
     setError(null)
     setActiveChatId(null)
   }, [])
@@ -245,9 +307,11 @@ export const ChatProvider = ({ children }) => {
         userPlan,
         hasUnlimitedChats,
         activeChatId,
+        recentChats,
         sendMessage,
         stopGenerating,
         fetchChatCount,
+        fetchRecentChats,
         loadHistory,
         resetChat,
         deleteChat,

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
 import MessageBubble from './MessageBubble'
@@ -16,6 +16,14 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
   const { user } = useAuth()
   const { messages, loading, sendMessage, chatCount } = useChat()
   const messagesEndRef = useRef(null)
+  const [visibleCount, setVisibleCount] = useState(50)
+
+  const hiddenCount = Math.max(0, messages.length - visibleCount)
+  const visibleMessages = messages.slice(Math.max(0, messages.length - visibleCount))
+
+  useEffect(() => {
+    if (messages.length === 0) setVisibleCount(50)
+  }, [messages.length === 0])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -83,7 +91,15 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
         </div>
       ) : (
         <div className="flex flex-col px-4 py-6 max-w-3xl mx-auto w-full">
-          {messages.map((message, index) => (
+          {hiddenCount > 0 && (
+            <button
+              onClick={() => setVisibleCount(c => c + 50)}
+              className="mx-auto mb-4 px-4 py-1.5 text-xs text-slate-500 bg-white border border-gray-200 rounded-full hover:bg-slate-50 transition-colors"
+            >
+              ↑ Load {Math.min(50, hiddenCount)} earlier messages
+            </button>
+          )}
+          {visibleMessages.map((message, index) => (
             <MessageBubble key={index} message={message} userInitials={userInitials} />
           ))}
           {/* Show typing indicator only when loading AND no streaming placeholder is already visible */}
