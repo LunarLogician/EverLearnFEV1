@@ -1189,15 +1189,18 @@ export default function Dashboard() {
         const cached = localStorage.getItem(getCacheKey())
         if (cached) {
           const { data, ts } = JSON.parse(cached)
-          if (Date.now() - ts < 5 * 60 * 1000) {
-            setQuizzes(data.quizzes || [])
-            setFlashcardSets(data.flashcards || [])
-            setMcqs(data.mcqs || [])
-            setExamPapers(data.examPapers || [])
-            setUserPlan(data.userPlan || 'free')
-            fetchChatCount()
-            return
-          }
+          // Always show cached data immediately
+          setQuizzes(data.quizzes || [])
+          setFlashcardSets(data.flashcards || [])
+          setMcqs(data.mcqs || [])
+          setExamPapers(data.examPapers || [])
+          setUserPlan(data.userPlan || 'free')
+          fetchChatCount()
+          // If cache is fresh (< 5 min), skip background refresh
+          if (Date.now() - ts < 5 * 60 * 1000) return
+          // Stale — refresh silently in background without showing loader
+          loadData(true)
+          return
         }
       } catch {}
     }
