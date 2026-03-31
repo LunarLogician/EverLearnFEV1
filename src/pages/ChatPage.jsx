@@ -14,7 +14,7 @@ import StudyTimer from '../components/StudyTimer'
 
 export default function ChatPage() {
   const navigate = useNavigate()
-  const { user, loading: authLoading, logout } = useAuth()
+  const { user, loading: authLoading, logout, streak } = useAuth()
   const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats } = useChat()
 
   const [showPaywall, setShowPaywall] = useState(false)
@@ -170,7 +170,14 @@ export default function ChatPage() {
               <span className="text-white text-xs font-semibold">{userInitials}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-medium truncate">{user.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-white text-xs font-medium truncate">{user.name}</p>
+                {streak > 0 && (
+                  <span className="flex items-center gap-0.5 text-[10px] font-bold text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                    🔥 {streak}
+                  </span>
+                )}
+              </div>
                     <p className="text-white/35 text-[11px] truncate">
                       {statsLoading ? '— / — tokens' : `${tokenCount.toLocaleString()} / ${tokenLimit.toLocaleString()} tokens`}
                     </p>

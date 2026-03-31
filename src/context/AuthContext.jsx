@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react'
-import { authService } from '../services/index'
+import { authService, streakService } from '../services/index'
 
 const AuthContext = createContext()
 
@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [streak, setStreak] = useState(0)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -19,8 +20,16 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const user = await authService.getCurrentUser()
-      setUser(user.user || user)
+      const data = await authService.getCurrentUser()
+      const u = data.user || data
+      setUser(u)
+      if (u) {
+        setStreak(u.streak || 0)
+        // Update streak silently — backend deduplicates same-day calls
+        streakService.updateStreak().then(res => {
+          if (res?.streak) setStreak(res.streak)
+        }).catch(() => {})
+      }
     } catch (err) {
       console.error('Failed to fetch user:', err)
       localStorage.removeItem('token')
@@ -60,6 +69,12 @@ export const AuthProvider = ({ children }) => {
       setError(null)
       const data = await authService.login(email, password)
       setUser(data.user)
+      if (data.user) {
+        setStreak(data.user.streak || 0)
+        streakService.updateStreak().then(res => {
+          if (res?.streak) setStreak(res.streak)
+        }).catch(() => {})
+      }
       return data
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed'
@@ -71,10 +86,11 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     authService.logout()
     setUser(null)
+    setStreak(0)
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, register, verifyEmail, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, register, verifyEmail, login, logout, streak }}>
       {children}
     </AuthContext.Provider>
   )

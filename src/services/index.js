@@ -253,6 +253,14 @@ export const mcqService = {
   },
 }
 
+export const streakService = {
+  // Call this once per session (on login or on mount). Backend handles dedup.
+  updateStreak: async () => {
+    const response = await api.post('/auth/streak')
+    return response.data  // { streak: number }
+  },
+}
+
 export const flashcardService = {
   getUserFlashcards: async () => {
     const response = await api.get('/flashcards')

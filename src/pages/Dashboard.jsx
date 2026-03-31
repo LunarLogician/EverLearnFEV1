@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
@@ -1125,7 +1125,7 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, loading: authLoading, logout } = useAuth()
+  const { user, loading: authLoading, logout, streak } = useAuth()
   const { chatCount, tokenCount, hasUnlimitedChats, userPlan: chatUserPlan, fetchChatCount, statsLoading } = useChat()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [quizzes, setQuizzes] = useState([])
@@ -1150,6 +1150,8 @@ export default function Dashboard() {
   const [activeExamPaper, setActiveExamPaper] = useState(null)
   const [showExamPaperModal, setShowExamPaperModal] = useState(false)
   const [userPlan, setUserPlan] = useState('free')
+
+  const progressRef = useRef(null)
 
   const userInitials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -1384,13 +1386,13 @@ export default function Dashboard() {
     {
       icon: <BarChart2 size={22} />,
       label: 'Progress',
-      description: 'Track your study streaks and quiz scores',
+      description: 'Track your study streaks and activity across all tools',
       color: 'bg-cyan-500',
       light: 'bg-cyan-50 border-cyan-100',
       textColor: 'text-cyan-700',
-      stat: 'Coming soon',
-      action: null,
-      actionLabel: 'Coming Soon',
+      stat: streak > 0 ? `🔥 ${streak} day streak` : 'View stats',
+      action: user ? () => progressRef.current?.scrollIntoView({ behavior: 'smooth' }) : null,
+      actionLabel: user ? 'View Progress' : 'Sign in to track',
     },
   ]
 
@@ -1703,6 +1705,94 @@ export default function Dashboard() {
                   </div>
                 </div>
               ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── Progress Section ── */}
+        {user && (
+          <motion.div
+            ref={progressRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="mt-10 mb-8"
+          >
+            <h2 className="text-slate-700 font-bold text-base flex items-center gap-2 mb-4">
+              <BarChart2 size={16} className="text-cyan-500" /> Your Progress
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Streak card */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-orange-50 flex items-center justify-center text-3xl flex-shrink-0">
+                  🔥
+                </div>
+                <div>
+                  <p className="text-3xl font-extrabold text-slate-800 leading-none">{streak || 0}</p>
+                  <p className="text-xs text-slate-400 mt-1">day streak</p>
+                  <p className="text-[11px] text-orange-500 font-semibold mt-0.5">
+                    {streak >= 7 ? 'On fire! 🏆' : streak >= 3 ? 'Keep it up!' : 'Just getting started'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Total study items */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                  <Trophy size={26} className="text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-3xl font-extrabold text-slate-800 leading-none">
+                    {quizzes.length + flashcardSets.length + mcqs.length + examPapers.length}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">study items created</p>
+                  <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">across all tools</p>
+                </div>
+              </div>
+
+              {/* Tokens used */}
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare size={24} className="text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-3xl font-extrabold text-slate-800 leading-none">
+                    {statsLoading ? '—' : tokenCount.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">tokens used in chat</p>
+                  <p className="text-[11px] text-blue-500 font-semibold mt-0.5">all conversations</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Activity breakdown bars */}
+            <div className="mt-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Activity by tool</p>
+              {(() => {
+                const items = [
+                  { label: 'Quizzes', count: quizzes.length, color: 'bg-violet-400' },
+                  { label: 'Flashcard Sets', count: flashcardSets.length, color: 'bg-amber-400' },
+                  { label: 'MCQs', count: mcqs.length, color: 'bg-indigo-400' },
+                  { label: 'Exam Papers', count: examPapers.length, color: 'bg-teal-400' },
+                ]
+                const max = Math.max(...items.map(i => i.count), 1)
+                return (
+                  <div className="space-y-3">
+                    {items.map(item => (
+                      <div key={item.label} className="flex items-center gap-3">
+                        <p className="text-xs text-slate-500 w-28 flex-shrink-0">{item.label}</p>
+                        <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${item.color} transition-all duration-700`}
+                            style={{ width: `${(item.count / max) * 100}%` }}
+                          />
+                        </div>
+                        <p className="text-xs font-bold text-slate-600 w-6 text-right">{item.count}</p>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
             </div>
           </motion.div>
         )}
