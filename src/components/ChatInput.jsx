@@ -170,7 +170,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       if (error?.response?.data?.upgradeRequired) {
         onLimitReached?.()
       }
-      console.error('Failed to send message:', error)
+
     }
   }
 

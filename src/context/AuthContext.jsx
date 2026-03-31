@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
         }).catch(() => {})
       }
     } catch (err) {
-      console.error('Failed to fetch user:', err)
+
       localStorage.removeItem('token')
       saveCachedUser(null)
       setUser(null)

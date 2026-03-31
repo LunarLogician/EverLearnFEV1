@@ -751,7 +751,7 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
       const data = await documentService.getUserDocuments();
       setDocuments(data.documents || []);
     } catch (err) {
-      console.error('Failed to load documents:', err);
+
       setError('Failed to load documents');
     }
   };

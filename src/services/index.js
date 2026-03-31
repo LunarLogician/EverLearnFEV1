@@ -57,14 +57,14 @@ export const chatService = {
     if (typeof documentId === 'string') payload.documentId = documentId;
     if (typeof image === 'string') payload.image = image;
     if (typeof chatId === 'string') payload.chatId = chatId;
-    console.log('[chatService.sendMessage] Sending:', payload);
+
     try {
       // Use /chat/direct for generic chat (no document)
       const response = await api.post('/chat/direct', payload);
-      console.log('[chatService.sendMessage] Response:', response.data);
+
       return response.data;
     } catch (err) {
-      console.error('[chatService.sendMessage] Error:', err?.response?.data || err.message);
+
       throw err;
     }
   },

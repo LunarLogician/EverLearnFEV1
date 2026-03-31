@@ -97,7 +97,7 @@ export const ChatProvider = ({ children }) => {
   }, [])
 
   const sendMessage = useCallback(async (message, documentId = null, docInfo = null, image = null) => {
-    console.log('[ChatContext.sendMessage] Called with:', { message, documentId, docInfo, image });
+
     try {
       setError(null);
       setLoading(true);
@@ -194,7 +194,7 @@ export const ChatProvider = ({ children }) => {
         if (trimmed[trimmed.length - 1]?.role === 'user') trimmed.pop()
         return trimmed
       });
-      console.error('[ChatContext.sendMessage] Error:', err.message);
+
       throw err;
     } finally {
       setLoading(false);
@@ -264,7 +264,7 @@ export const ChatProvider = ({ children }) => {
       setMessages(allMessages)
       return data
     } catch (err) {
-      console.error('[loadHistory] failed:', err.response?.data || err.message)
+
     } finally {
       setHistoryLoading(false)
     }
