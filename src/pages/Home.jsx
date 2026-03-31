@@ -4,6 +4,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { SEOHelmet } from '../components/SEOHelmet'
 import { StructuredData } from '../components/StructuredData'
+import AuthModal from '../components/AuthModal'
 import {
   MessageSquare, Target, Layers, PenLine,
   FileText, BarChart2, ArrowRight, Check, X,
@@ -187,6 +188,7 @@ export default function Home() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [demoTab, setDemoTab] = useState('mcq')
+  const [authModalOpen, setAuthModalOpen] = useState(false)
 
   useEffect(() => {
     if (!document.getElementById('everlearn-fonts')) {
@@ -202,6 +204,7 @@ export default function Home() {
   }, [])
 
   return (
+    <>
     <div className="bg-[#fdfcf8] text-gray-900 overflow-x-hidden">
       <SEOHelmet 
         title="EverlearnAI - Free MCQ Generator, Quiz Maker & Study Tools"
@@ -264,7 +267,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="hidden md:flex items-center gap-2">
-                <button onClick={() => navigate('/chat')}
+                <button onClick={() => setAuthModalOpen(true)}
                   className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-all">
                   Log in
                 </button>
@@ -317,7 +320,7 @@ export default function Home() {
             ) : (
               <div className="pt-2 border-t border-gray-100 space-y-0.5">
                 <button
-                  onClick={() => { navigate('/chat'); setMobileNavOpen(false) }}
+                  onClick={() => { setAuthModalOpen(true); setMobileNavOpen(false) }}
                   className="block w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
                 >
                   Log in
@@ -1070,5 +1073,13 @@ export default function Home() {
       </footer>
 
     </div>
+
+    {authModalOpen && (
+      <AuthModal
+        onClose={() => setAuthModalOpen(false)}
+        onSuccess={() => { setAuthModalOpen(false); navigate('/chat') }}
+      />
+    )}
+    </>
   )
 }

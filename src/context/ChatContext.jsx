@@ -21,6 +21,8 @@ export const ChatProvider = ({ children }) => {
   // characters and drained one at a time so the UI renders char-by-char.
   const dripQueueRef = useRef([])       // pending characters
   const dripIntervalRef = useRef(null)  // setInterval handle
+  const abortControllerRef = useRef(null)
+  const [isStreaming, setIsStreaming] = useState(false)
 
   const startDrip = useCallback(() => {
     if (dripIntervalRef.current) return  // already running
@@ -41,6 +43,23 @@ export const ChatProvider = ({ children }) => {
         return updated
       })
     }, 6) // ~12ms per tick, 5 chars/tick ≈ 300 chars/sec (ChatGPT-speed feel)
+  }, [])
+
+  const stopGenerating = useCallback(() => {
+    abortControllerRef.current?.abort()
+    clearInterval(dripIntervalRef.current)
+    dripIntervalRef.current = null
+    dripQueueRef.current = []
+    setMessages((prev) => {
+      const updated = [...prev]
+      const last = updated[updated.length - 1]
+      if (last?.role === 'assistant' && last.streaming) {
+        updated[updated.length - 1] = { ...last, streaming: false }
+      }
+      return updated
+    })
+    setLoading(false)
+    setIsStreaming(false)
   }, [])
 
   const sendMessage = useCallback(async (message, documentId = null, docInfo = null, image = null) => {
@@ -70,6 +89,11 @@ export const ChatProvider = ({ children }) => {
       // Reset drip queue for this new response
       dripQueueRef.current = []
 
+      // Create a new AbortController for this request
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+      setIsStreaming(true)
+
       // Stream tokens — push each chunk's characters into the drip queue
       const result = await chatService.sendMessageStream(
         message,
@@ -81,7 +105,8 @@ export const ChatProvider = ({ children }) => {
           startDrip()
           // Hide the TypingIndicator once the first chunk arrives
           setLoading(false)
-        }
+        },
+        controller.signal
       );
 
       // Wait for the drip queue to fully drain before marking streaming done
@@ -94,6 +119,8 @@ export const ChatProvider = ({ children }) => {
         }, 32)
       })
 
+      setIsStreaming(false)
+
       // Mark streaming done on the placeholder
       setMessages((prev) => {
         const updated = [...prev]
@@ -104,8 +131,8 @@ export const ChatProvider = ({ children }) => {
         return updated
       })
 
-      // Refresh token count from server after each message
-      fetchChatCount();
+      // Refresh token count from server after each message (skip if aborted)
+      if (!result?.aborted) fetchChatCount();
 
       // Track the active chat session so subsequent messages append to same Chat doc
       if (result.chatId) {
@@ -120,6 +147,7 @@ export const ChatProvider = ({ children }) => {
       clearInterval(dripIntervalRef.current)
       dripIntervalRef.current = null
       dripQueueRef.current = []
+      setIsStreaming(false)
       // Remove both the user message and the empty assistant placeholder
       setMessages((prev) => {
         const trimmed = [...prev]
@@ -207,6 +235,7 @@ export const ChatProvider = ({ children }) => {
       value={{
         messages,
         loading,
+        isStreaming,
         historyLoading,
         error,
         chatCount,
@@ -217,6 +246,7 @@ export const ChatProvider = ({ children }) => {
         hasUnlimitedChats,
         activeChatId,
         sendMessage,
+        stopGenerating,
         fetchChatCount,
         loadHistory,
         resetChat,

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useChat } from '../context/ChatContext'
-import { Send, LogIn, Sparkles, Paperclip, X, FileText, CheckCircle, AlertCircle, Loader2, ImagePlus } from 'lucide-react'
+import { Send, LogIn, Sparkles, Paperclip, X, FileText, CheckCircle, AlertCircle, Loader2, ImagePlus, Square } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { documentService } from '../services'
 
@@ -16,7 +16,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
   const fileInputRef = useRef(null)
   const imageInputRef = useRef(null)
   const pollRef = useRef(null)
-  const { sendMessage, loading, chatCount } = useChat()
+  const { sendMessage, loading, isStreaming, stopGenerating, chatCount } = useChat()
 
   // Poll for document processing status every 2s until completed/failed
   const pollDocStatus = useCallback((docId) => {
@@ -161,6 +161,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       const docInfo = uploadedDoc ? { name: uploadedDoc.name, type: uploadedDoc.name.split('.').pop().toUpperCase() } : null
       const imgData = imageBase64 || null
       setInput('')
+      if (inputRef.current) inputRef.current.style.height = 'auto'
       inputRef.current?.focus()
       if (uploadedDoc) removeDoc()
       if (imageBase64) removeImage()
@@ -178,7 +179,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
   const charCount = input.length
   const charWarning = charCount > MAX_CHARS * 0.8 // Warning at 80%
   const charExceeded = charCount > MAX_CHARS
-  const canSend = !!(input.trim() || imageBase64) && !loading && isAuthenticated && !disabled && isDocReady && !charExceeded
+  const canSend = !!(input.trim() || imageBase64) && !loading && !isStreaming && isAuthenticated && !disabled && isDocReady && !charExceeded
 
   const docStatusIcon = () => {
     if (!uploadedDoc) return null
@@ -296,13 +297,23 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
             </motion.button>
           )}
 
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
+            rows={1}
             value={input}
             onChange={(e) => {
               const text = e.target.value
-              if (text.length <= MAX_CHARS) setInput(text)
+              if (text.length <= MAX_CHARS) {
+                setInput(text)
+                e.target.style.height = 'auto'
+                e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px'
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                handleSubmit(e)
+              }
             }}
             onClick={handleInputClick}
             placeholder={
@@ -313,31 +324,44 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
               : 'Ask anything about your studies...'
             }
             disabled={loading || disabled}
-            className={`flex-1 bg-transparent outline-none text-slate-800 text-sm placeholder:text-slate-400 py-4 min-w-0 ${
+            className={`flex-1 bg-transparent outline-none text-slate-800 text-sm placeholder:text-slate-400 py-4 min-w-0 resize-none overflow-hidden leading-relaxed ${
               !isAuthenticated ? 'cursor-pointer' : ''
             }`}
           />
 
-          <motion.button
-            whileHover={canSend ? { scale: 1.08 } : {}}
-            whileTap={canSend ? { scale: 0.93 } : {}}
-            type="submit"
-            disabled={!canSend}
-            onClick={!isAuthenticated ? () => onLoginClick?.() : undefined}
-            className={`flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
-              canSend
-                ? 'bg-gradient-to-br from-emerald-900 to-emerald-600 text-white shadow-sm shadow-emerald-900/25'
-                : 'bg-gray-100 text-slate-300'
-            }`}
-          >
-            {loading ? (
-              <div className="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full" />
-            ) : !isAuthenticated ? (
-              <LogIn size={15} />
-            ) : (
-              <Send size={15} />
-            )}
-          </motion.button>
+          {isStreaming ? (
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.93 }}
+              onClick={stopGenerating}
+              title="Stop generating"
+              className="flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white transition-all"
+            >
+              <Square size={13} fill="currentColor" />
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={canSend ? { scale: 1.08 } : {}}
+              whileTap={canSend ? { scale: 0.93 } : {}}
+              type="submit"
+              disabled={!canSend}
+              onClick={!isAuthenticated ? () => onLoginClick?.() : undefined}
+              className={`flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
+                canSend
+                  ? 'bg-gradient-to-br from-emerald-900 to-emerald-600 text-white shadow-sm shadow-emerald-900/25'
+                  : 'bg-gray-100 text-slate-300'
+              }`}
+            >
+              {loading ? (
+                <div className="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full" />
+              ) : !isAuthenticated ? (
+                <LogIn size={15} />
+              ) : (
+                <Send size={15} />
+              )}
+            </motion.button>
+          )}
         </div>
       </div>
 

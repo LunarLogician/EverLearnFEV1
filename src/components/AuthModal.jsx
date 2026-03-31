@@ -58,7 +58,7 @@ function OTPBoxes({ onComplete }) {
 /* ------------------------------------------------------------------ */
 /*  Main Modal                                                          */
 /* ------------------------------------------------------------------ */
-export default function AuthModal({ onClose }) {
+export default function AuthModal({ onClose, onSuccess }) {
   const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(true)
   const [view, setView] = useState('auth') // 'auth' | 'verify'
@@ -102,14 +102,14 @@ export default function AuthModal({ onClose }) {
     try {
       if (isLogin) {
         await login(formData.email, formData.password)
-        onClose?.()
+        onSuccess ? onSuccess() : onClose?.()
       } else {
         const data = await register(formData.name, formData.email, formData.password)
         if (data.requiresVerification) {
           setPendingEmail(formData.email)
           setView('verify')
         } else {
-          onClose?.()
+          onSuccess ? onSuccess() : onClose?.()
         }
       }
     } catch (err) {
@@ -124,7 +124,7 @@ export default function AuthModal({ onClose }) {
     setLoading(true)
     try {
       await verifyEmail(pendingEmail, otp)
-      onClose?.()
+      onSuccess ? onSuccess() : onClose?.()
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid or expired code')
     } finally {

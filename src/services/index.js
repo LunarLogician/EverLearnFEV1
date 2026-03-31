@@ -73,7 +73,7 @@ export const chatService = {
   // onChunk(text): called for each token chunk
   // Returns a Promise that resolves with { chatId, tokenCount } on completion
   // or rejects with an Error on stream-level or HTTP errors.
-  sendMessageStream: (message, documentId = null, image = null, chatId = null, onChunk) => {
+  sendMessageStream: (message, documentId = null, image = null, chatId = null, onChunk, signal = null) => {
     const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
     const token = localStorage.getItem('token')
     const payload = { message }
@@ -91,8 +91,12 @@ export const chatService = {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(payload),
+          signal,
         })
       } catch (networkErr) {
+        if (networkErr.name === 'AbortError') {
+          return resolve({ chatId: null, tokenCount: 0, aborted: true })
+        }
         return reject(new Error('Network error — could not reach the server.'))
       }
 
@@ -137,6 +141,9 @@ export const chatService = {
             }
           }
         } catch (readErr) {
+          if (readErr.name === 'AbortError') {
+            return resolve({ chatId: null, tokenCount: 0, aborted: true })
+          }
           reject(new Error('Stream read error: ' + readErr.message))
         }
       }

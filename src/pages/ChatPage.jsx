@@ -25,20 +25,22 @@ export default function ChatPage() {
   useEffect(() => {
     if (user) {
       if (prevEmailRef.current !== undefined && prevEmailRef.current !== user.email) {
-        // Different user logged in — clear and reload
+        // Different user logged in — clear state
         resetChat()
       }
       prevEmailRef.current = user.email
       fetchChatCount()
-      loadHistory().then(data => {
+      // Always start a new chat — fetch sidebar data without loading old messages
+      resetChat()
+      chatService.getChats().then(data => {
         if (data?.chats) setRecentChats(data.chats)
-      })
+      }).catch(() => {})
     } else {
       prevEmailRef.current = undefined
       resetChat()
       setRecentChats([])
     }
-  }, [user, fetchChatCount, loadHistory, resetChat])
+  }, [user, fetchChatCount, resetChat])
 
   const userInitials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
