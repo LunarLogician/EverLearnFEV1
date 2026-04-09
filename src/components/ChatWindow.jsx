@@ -126,10 +126,10 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + i * 0.05 }}
-                whileHover={{ y: -3, backgroundColor: '#f8fafc', borderColor: '#34d399' }}
+                whileHover={{ y: -3 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleSuggestion(s.text)}
-                className="flex items-start gap-4 bg-white dark:bg-[#1a1b23] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md group"
+                className="flex items-start gap-4 bg-white dark:bg-[#1a1b23] border border-gray-200 dark:border-gray-700 hover:border-emerald-400 dark:hover:border-emerald-600 rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md group"
               >
                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-50 border border-slate-100 group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-colors flex-shrink-0">
                   <span className="text-lg">{s.emoji}</span>
