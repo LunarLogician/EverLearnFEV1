@@ -39,6 +39,15 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
     ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : ''
 
+  const [copiedResponse, setCopiedResponse] = useState(false)
+  const copyResponse = useCallback(() => {
+    if (!message.content) return
+    navigator.clipboard.writeText(message.content).then(() => {
+      setCopiedResponse(true)
+      setTimeout(() => setCopiedResponse(false), 2000)
+    })
+  }, [message.content])
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -101,7 +110,7 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
                     />
                   ),
                   strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
-                  em: ({ children }) => <em className="italic text-slate-500">{children}</em>,
+                  em: ({ children }) => <em className="italic text-slate-600">{children}</em>,
                   del: ({ children }) => <del className="line-through text-slate-400">{children}</del>,
                   a: ({ href, children }) => (
                     <a
@@ -155,6 +164,19 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
               </ReactMarkdown>
               {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
             </div>
+            
+            {/* AI Action Bar */}
+            {!message.streaming && (
+              <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100 opacity-60 hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={copyResponse}
+                  className="flex items-center justify-center p-1.5 rounded-md hover:bg-emerald-50 hover:text-emerald-700 text-slate-400 transition-colors"
+                  title="Copy response"
+                >
+                  {copiedResponse ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                </button>
+              </div>
+            )}
           </div>
         )}
         {timeStr && (
