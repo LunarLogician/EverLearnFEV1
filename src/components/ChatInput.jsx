@@ -47,9 +47,13 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
     return () => { if (pollRef.current) clearTimeout(pollRef.current) }
   }, [])
 
-  // Refocus input automatically when AI finishes responding
+  // Refocus input automatically when AI finishes responding (desktop only)
   useEffect(() => {
     if (!loading && !isStreaming && isAuthenticated && !disabled) {
+      // Skip refocus on mobile/touch devices to prevent virtual keyboard from popping up
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      if (isTouchDevice) return
+
       setTimeout(() => {
         if (inputRef.current) {
           inputRef.current.focus()
@@ -178,7 +182,8 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       }
       
       setTimeout(() => {
-        if (inputRef.current) inputRef.current.focus()
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+        if (inputRef.current && !isTouchDevice) inputRef.current.focus()
       }, 0)
 
       if (uploadedDoc) removeDoc()
