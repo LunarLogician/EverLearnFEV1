@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './context/AuthContext'
 import { ChatProvider } from './context/ChatContext'
+import { ThemeProvider } from './context/ThemeContext'
 import PaywallModal from './components/PaywallModal'
 import './styles/index.css'
 
@@ -33,6 +34,7 @@ function App() {
 
   return (
     <HelmetProvider>
+      <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
           <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
@@ -59,6 +61,7 @@ function App() {
           )}
         </BrowserRouter>
       </AuthProvider>
+      </ThemeProvider>
     </HelmetProvider>
   )
 }

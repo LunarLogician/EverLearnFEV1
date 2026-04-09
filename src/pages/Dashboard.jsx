@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { useTheme } from '../context/ThemeContext'
 import { SEOHelmet } from '../components/SEOHelmet'
 import { quizService, flashcardService, chatService, subscriptionService, mcqService, documentService, examPaperService } from '../services'
 import AuthModal from '../components/AuthModal'
@@ -13,7 +14,7 @@ import {
   ChevronRight, Trophy, Zap, Target, X, Loader2, CheckCircle,
   AlertCircle, BarChart2, Clock, Star, Upload, Paperclip, Trash2,
   ClipboardList, GraduationCap, Brain, Sparkles, Calendar,
-  TrendingUp, Award, Flame, Eye
+  TrendingUp, Award, Flame, Eye, Sun, Moon
 } from 'lucide-react'
 
 // ── Quiz Generator Modal ──────────────────────────────────────────────────────
@@ -1131,6 +1132,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const { user, loading: authLoading, logout, streak } = useAuth()
   const { chatCount, tokenCount, hasUnlimitedChats, userPlan: chatUserPlan, fetchChatCount, statsLoading } = useChat()
+  const { theme, toggleTheme, isDark } = useTheme()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [quizzes, setQuizzes] = useState([])
   const [flashcardSets, setFlashcardSets] = useState([])
@@ -1482,16 +1484,16 @@ export default function Dashboard() {
         url="https://everlearn.ai/dashboard"
         keywords="dashboard, progress tracking, study stats, performance analytics"
       />
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col selection:bg-emerald-500/20">
+      <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f1117] flex flex-col selection:bg-emerald-500/20 transition-colors duration-300">
 
       {/* ── Top Navbar ── */}
-      <header className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 shadow-sm">
+      <header className="bg-white dark:bg-[#1a1b23] border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 shadow-sm dark:shadow-none transition-colors duration-300">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg overflow-hidden bg-emerald-50 flex items-center justify-center p-1.5">
             <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <p className="text-slate-800 font-bold text-sm leading-none mb-0.5">Everlearn</p>
+            <p className="text-slate-800 dark:text-slate-200 font-bold text-sm leading-none mb-0.5">Everlearn</p>
             <p className="text-emerald-600 font-semibold tracking-wider text-[9px] uppercase leading-none">AI Study Hub</p>
           </div>
         </div>
@@ -1499,32 +1501,41 @@ export default function Dashboard() {
         <nav className="hidden md:flex items-center gap-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-4 py-2 text-slate-700 text-xs font-semibold rounded-lg bg-emerald-50 border border-emerald-200"
+            className="px-4 py-2 text-slate-700 dark:text-emerald-300 text-xs font-semibold rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800"
           >
             Dashboard
           </button>
           <button
             onClick={() => navigate('/exam-papers')}
-            className="px-4 py-2 text-slate-500 text-xs font-medium rounded-lg hover:bg-slate-50 hover:text-slate-700 transition-colors"
+            className="px-4 py-2 text-slate-500 dark:text-slate-400 text-xs font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
             Exam Papers
           </button>
           <button
             onClick={() => navigate('/chat')}
-            className="px-4 py-2 text-slate-500 text-xs font-medium rounded-lg hover:bg-slate-50 hover:text-slate-700 transition-colors"
+            className="px-4 py-2 text-slate-500 dark:text-slate-400 text-xs font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
             AI Chat
           </button>
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
           {user ? (
             <>
-              <div className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-gray-200">
+              <div className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700">
                 <div className="h-7 w-7 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center">
                   <span className="text-white text-[10px] font-bold">{userInitials}</span>
                 </div>
-                <span className="text-slate-700 text-xs font-medium pr-1">{user.name.split(' ')[0]}</span>
+                <span className="text-slate-700 dark:text-slate-300 text-xs font-medium pr-1">{user.name.split(' ')[0]}</span>
               </div>
               <button
                 onClick={logout}
@@ -1546,20 +1557,20 @@ export default function Dashboard() {
       </header>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 md:px-8 py-8 md:py-12">
+      <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 md:px-8 py-8 md:py-12 transition-colors duration-300">
 
         {/* Welcome Section with Stats */}
         <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-[34px] font-extrabold text-slate-900 tracking-tight">
+              <h1 className="text-3xl md:text-[34px] font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {user ? (
                   <>Welcome back, <span className="bg-gradient-to-r from-emerald-700 to-emerald-800 bg-clip-text text-transparent">{user.name.split(' ')[0]}</span> 👋</>
                 ) : (
                   'Welcome to Everlearn 👋'
                 )}
               </h1>
-              <p className="text-slate-500 text-[15px] mt-1.5 font-medium max-w-xl">
+              <p className="text-slate-500 dark:text-slate-400 text-[15px] mt-1.5 font-medium max-w-xl">
                 {user ? 'Your intelligent study hub is ready. Pick a tool below to continue learning.' : 'Sign in to unlock all features and start studying smarter.'}
               </p>
             </div>
@@ -1592,13 +1603,13 @@ export default function Dashboard() {
               { label: 'Practice MCQs', value: mcqs.length, icon: <BookOpen size={16} strokeWidth={2.5}/>, color: 'text-indigo-600', iconBg: 'bg-indigo-100', hoverBorder: 'hover:border-indigo-200' },
               { label: 'Exam Preps', value: examPapers.length, icon: <Award size={16} strokeWidth={2.5}/>, color: 'text-teal-700', iconBg: 'bg-teal-100', hoverBorder: 'hover:border-teal-200' },
             ].map((s, i) => (
-              <div key={i} className={`group bg-white rounded-2xl border border-slate-200/60 px-5 py-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4 ${s.hoverBorder}`}>
+              <div key={i} className={`group bg-white dark:bg-[#1a1b23] rounded-2xl border border-slate-200/60 dark:border-gray-800 px-5 py-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4 ${s.hoverBorder}`}>
                 <div className={`h-11 w-11 rounded-xl ${s.iconBg} flex items-center justify-center flex-shrink-0 ${s.color} group-hover:scale-105 transition-transform duration-300`}>
                   {s.icon}
                 </div>
                 <div>
-                  <p className="text-2xl font-extrabold text-slate-800 leading-none tracking-tight">{(dataLoading || s.loading) ? '—' : s.value.toLocaleString()}</p>
-                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mt-1">{s.label}</p>
+                  <p className="text-2xl font-extrabold text-slate-800 dark:text-white leading-none tracking-tight">{(dataLoading || s.loading) ? '—' : s.value.toLocaleString()}</p>
+                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-1">{s.label}</p>
                 </div>
               </div>
             ))}
@@ -1613,9 +1624,9 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 + (0.04 * i), duration: 0.4 }}
-              className="group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-lg p-6 flex flex-col hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+              className="group relative bg-white dark:bg-[#1a1b23] rounded-2xl border border-slate-200/70 dark:border-gray-800 shadow-sm hover:shadow-lg p-6 flex flex-col hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/50 dark:from-[#1a1b23] dark:to-[#15161d] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
               
               <div className="relative z-10 flex items-start justify-between mb-5">
                 <div className={`h-12 w-12 rounded-xl bg-gradient-to-r ${card.color} text-white flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
@@ -1625,8 +1636,8 @@ export default function Dashboard() {
                   {card.stat.split(' ')[0]}
                 </span>
               </div>
-              <h3 className="relative z-10 text-slate-900 font-extrabold text-[17px] tracking-tight mb-2 group-hover:text-emerald-700 transition-colors">{card.label}</h3>
-              <p className="relative z-10 text-slate-500 font-medium text-[13px] leading-relaxed flex-1 mb-6">{card.description}</p>
+              <h3 className="relative z-10 text-slate-900 dark:text-white font-extrabold text-[17px] tracking-tight mb-2 group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">{card.label}</h3>
+              <p className="relative z-10 text-slate-500 dark:text-slate-400 font-medium text-[13px] leading-relaxed flex-1 mb-6">{card.description}</p>
               
               <button
                 onClick={card.action || undefined}
@@ -1650,13 +1661,13 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
-            className="mb-12 bg-white rounded-3xl border border-slate-200/70 p-6 md:p-8 shadow-sm relative overflow-hidden"
+            className="mb-12 bg-white dark:bg-[#1a1b23] rounded-3xl border border-slate-200/70 dark:border-gray-800 p-6 md:p-8 shadow-sm relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-                <h2 className="text-slate-900 font-extrabold text-[18px] tracking-tight flex items-center gap-2.5">
+                <h2 className="text-slate-900 dark:text-white font-extrabold text-[18px] tracking-tight flex items-center gap-2.5">
                   <div className="bg-emerald-100 p-1.5 rounded-lg"><TrendingUp size={18} className="text-emerald-600 stroke-[2.5px]" /></div> Your Learning Analytics
                 </h2>
                 <div className="flex items-center gap-2 text-xs text-slate-500 bg-slate-50 px-3 py-1.5 rounded-full">
@@ -1700,7 +1711,7 @@ export default function Dashboard() {
                           <div key={item.label} className="flex items-center gap-4 group">
                             <div className="flex items-center gap-1.5 w-28">
                               <span className="text-slate-500">{item.icon}</span>
-                              <span className="text-slate-700 font-bold text-[13px] tracking-tight">{item.label}</span>
+                              <span className="text-slate-700 dark:text-slate-300 font-bold text-[13px] tracking-tight">{item.label}</span>
                             </div>
                             <div className="flex-1 h-3.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
                               <div
@@ -1710,7 +1721,7 @@ export default function Dashboard() {
                                 <div className="absolute inset-0 bg-white/20 w-1/2 skew-x-12 animate-[shimmer_2s_infinite]"></div>
                               </div>
                             </div>
-                            <span className="text-slate-800 font-bold text-[14px] w-8 text-right bg-slate-50 py-0.5 rounded px-1 border border-slate-100">{item.count}</span>
+                            <span className="text-slate-800 dark:text-white font-bold text-[14px] w-8 text-right bg-slate-50 dark:bg-slate-800 py-0.5 rounded px-1 border border-slate-100 dark:border-gray-700">{item.count}</span>
                           </div>
                         ))}
                       </div>
@@ -1737,8 +1748,8 @@ export default function Dashboard() {
           {user && (quizzes.length > 0 || dataLoading) && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
               <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
-                  <div className="bg-violet-100 p-1 rounded-md"><Target size={14} className="text-violet-600 stroke-[2.5px]"/></div> Recent Quizzes
+                <h2 className="text-slate-800 dark:text-white font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-violet-100 dark:bg-violet-900/30 p-1 rounded-md"><Target size={14} className="text-violet-600 dark:text-violet-400 stroke-[2.5px]"/></div> Recent Quizzes
                 </h2>
                 <button onClick={() => setShowQuizModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-violet-300 hover:bg-violet-50 text-slate-600 hover:text-violet-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
                   <Plus size={14} strokeWidth={2.5} /> New
@@ -1746,7 +1757,7 @@ export default function Dashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dataLoading && quizzes.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : quizzes.slice(0, 3).map((quiz) => (
-                  <div key={quiz._id} onClick={() => !loadingQuizId && !deletingQuizId && openQuiz(quiz)} className="group cursor-pointer bg-white border border-slate-200 hover:border-violet-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                  <div key={quiz._id} onClick={() => !loadingQuizId && !deletingQuizId && openQuiz(quiz)} className="group cursor-pointer bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
                     <button onClick={(e) => deleteQuiz(e, quiz._id)} disabled={!!deletingQuizId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
                       {deletingQuizId === quiz._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
                     </button>
@@ -1755,8 +1766,8 @@ export default function Dashboard() {
                         {loadingQuizId === quiz._id ? <Loader2 size={18} className="animate-spin" /> : <Target size={18} strokeWidth={2.5} />}
                       </div>
                       <div className="min-w-0 pt-0.5">
-                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-violet-700 transition-colors">{quiz.quizTitle}</p>
-                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{quiz.totalQuestions} questions</p>
+                        <p className="text-slate-800 dark:text-white font-bold text-sm truncate group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors">{quiz.quizTitle}</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-[11px] mt-0.5">{quiz.totalQuestions} questions</p>
                       </div>
                     </div>
                   </div>
@@ -1775,8 +1786,8 @@ export default function Dashboard() {
           {user && (flashcardSets.length > 0 || dataLoading) && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
               <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
-                  <div className="bg-amber-100 p-1 rounded-md"><Layers size={14} className="text-amber-600 stroke-[2.5px]"/></div> Flashcard Sets
+                <h2 className="text-slate-800 dark:text-white font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-amber-100 dark:bg-amber-900/30 p-1 rounded-md"><Layers size={14} className="text-amber-600 dark:text-amber-400 stroke-[2.5px]"/></div> Flashcard Sets
                 </h2>
                 <button onClick={() => setShowFlashcardModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-amber-300 hover:bg-amber-50 text-slate-600 hover:text-amber-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
                   <Plus size={14} strokeWidth={2.5} /> New
@@ -1784,7 +1795,7 @@ export default function Dashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dataLoading && flashcardSets.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : flashcardSets.slice(0, 3).map((set) => (
-                  <div key={set._id} onClick={() => !loadingFlashSet && !deletingFlashSetId && openFlashcardSet(set._id)} className="group cursor-pointer bg-white border border-slate-200 hover:border-amber-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                  <div key={set._id} onClick={() => !loadingFlashSet && !deletingFlashSetId && openFlashcardSet(set._id)} className="group cursor-pointer bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-800 hover:border-amber-300 dark:hover:border-amber-700 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
                     <button onClick={(e) => deleteFlashcardSet(e, set._id)} disabled={!!deletingFlashSetId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
                       {deletingFlashSetId === set._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
                     </button>
@@ -1793,8 +1804,8 @@ export default function Dashboard() {
                         {loadingFlashSet === set._id ? <Loader2 size={18} className="animate-spin" /> : <Layers size={18} strokeWidth={2.5} />}
                       </div>
                       <div className="min-w-0 pt-0.5">
-                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-amber-700 transition-colors">{set.setTitle}</p>
-                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{set.totalCards} cards</p>
+                        <p className="text-slate-800 dark:text-white font-bold text-sm truncate group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">{set.setTitle}</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-[11px] mt-0.5">{set.totalCards} cards</p>
                       </div>
                     </div>
                   </div>
@@ -1813,8 +1824,8 @@ export default function Dashboard() {
           {user && (examPapers.length > 0 || dataLoading) && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
               <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
-                  <div className="bg-teal-100 p-1 rounded-md"><ClipboardList size={14} className="text-teal-600 stroke-[2.5px]"/></div> Exam Papers
+                <h2 className="text-slate-800 dark:text-white font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-teal-100 dark:bg-teal-900/30 p-1 rounded-md"><ClipboardList size={14} className="text-teal-600 dark:text-teal-400 stroke-[2.5px]"/></div> Exam Papers
                 </h2>
                 <button onClick={() => setShowExamPaperModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-teal-300 hover:bg-teal-50 text-slate-600 hover:text-teal-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
                   <Plus size={14} strokeWidth={2.5} /> New
@@ -1822,7 +1833,7 @@ export default function Dashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dataLoading && examPapers.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : examPapers.slice(0, 3).map((paper) => (
-                  <div key={paper._id} onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)} className="group cursor-pointer bg-white border border-slate-200 hover:border-teal-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                  <div key={paper._id} onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)} className="group cursor-pointer bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-800 hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
                     <button onClick={(e) => deleteExamPaper(e, paper._id)} disabled={!!deletingExamPaperId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
                       {deletingExamPaperId === paper._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
                     </button>
@@ -1831,8 +1842,8 @@ export default function Dashboard() {
                         {loadingExamPaperId === paper._id ? <Loader2 size={18} className="animate-spin" /> : <ClipboardList size={18} strokeWidth={2.5} />}
                       </div>
                       <div className="min-w-0 pt-0.5">
-                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-teal-700 transition-colors">{paper.title}</p>
-                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{paper.totalMarks || '—'} marks total</p>
+                        <p className="text-slate-800 dark:text-white font-bold text-sm truncate group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">{paper.title}</p>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium text-[11px] mt-0.5">{paper.totalMarks || '—'} marks total</p>
                       </div>
                     </div>
                   </div>
@@ -1852,8 +1863,8 @@ export default function Dashboard() {
             <div className="w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
               <GraduationCap size={36} className="text-emerald-700" />
             </div>
-            <h3 className="text-slate-800 font-extrabold text-2xl mb-3">Ready to study smarter?</h3>
-            <p className="text-slate-500 text-base mb-8 max-w-md mx-auto">Access AI chat, generate quizzes on the fly, and track your unstoppable study streak.</p>
+            <h3 className="text-slate-800 dark:text-white font-extrabold text-2xl mb-3">Ready to study smarter?</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-base mb-8 max-w-md mx-auto">Access AI chat, generate quizzes on the fly, and track your unstoppable study streak.</p>
             <button
               onClick={() => setShowAuthModal(true)}
               className="px-8 py-3.5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg"
