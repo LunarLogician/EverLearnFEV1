@@ -1597,7 +1597,7 @@ export default function Dashboard() {
             className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-10"
           >
             {[
-              { label: 'Study Sessions', value: tokenCount, icon: <Brain size={16} strokeWidth={2.5}/>, color: 'text-blue-600', iconBg: 'bg-blue-100', hoverBorder: 'hover:border-blue-200', loading: statsLoading },
+              { label: 'Tokens Used', value: tokenCount, icon: <Brain size={16} strokeWidth={2.5}/>, color: 'text-blue-600', iconBg: 'bg-blue-100', hoverBorder: 'hover:border-blue-200', loading: statsLoading },
               { label: 'Quizzes Taken', value: quizzes.length, icon: <Target size={16} strokeWidth={2.5}/>, color: 'text-violet-600', iconBg: 'bg-violet-100', hoverBorder: 'hover:border-violet-200' },
               { label: 'Flashcards', value: flashcardSets.length, icon: <Layers size={16} strokeWidth={2.5}/>, color: 'text-amber-600', iconBg: 'bg-amber-100', hoverBorder: 'hover:border-amber-200' },
               { label: 'Practice MCQs', value: mcqs.length, icon: <BookOpen size={16} strokeWidth={2.5}/>, color: 'text-indigo-600', iconBg: 'bg-indigo-100', hoverBorder: 'hover:border-indigo-200' },
