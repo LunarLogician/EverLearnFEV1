@@ -69,15 +69,15 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
       {historyLoading ? (
         <div className="flex-1 flex flex-col px-4 py-8 max-w-3xl mx-auto w-full gap-8 mt-10">
           <div className="flex gap-4 justify-end">
-            <div className="h-16 w-56 bg-slate-200/60 rounded-2xl rounded-tr-sm animate-pulse"></div>
-            <div className="h-8 w-8 rounded-xl bg-slate-200 animate-pulse flex-shrink-0"></div>
+            <div className="h-16 w-56 bg-slate-200/60 dark:bg-slate-700/40 rounded-2xl rounded-tr-sm animate-pulse"></div>
+            <div className="h-8 w-8 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse flex-shrink-0"></div>
           </div>
           <div className="flex gap-4 justify-start">
-            <div className="h-8 w-8 rounded-xl bg-emerald-100 animate-pulse flex-shrink-0"></div>
+            <div className="h-8 w-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 animate-pulse flex-shrink-0"></div>
             <div className="flex flex-col gap-2 w-3/4">
-              <div className="h-4 w-full bg-slate-200/50 rounded animate-pulse"></div>
-              <div className="h-4 w-[90%] bg-slate-200/50 rounded animate-pulse"></div>
-              <div className="h-4 w-[60%] bg-slate-200/50 rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-slate-200/50 dark:bg-slate-700/40 rounded animate-pulse"></div>
+              <div className="h-4 w-[90%] bg-slate-200/50 dark:bg-slate-700/40 rounded animate-pulse"></div>
+              <div className="h-4 w-[60%] bg-slate-200/50 dark:bg-slate-700/40 rounded animate-pulse"></div>
             </div>
           </div>
           <div className="flex gap-4 justify-end">
@@ -100,7 +100,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl font-bold text-slate-800 mb-1"
+            className="text-xl font-bold text-slate-800 dark:text-white mb-1"
           >
             {user ? `Hi ${user.name.split(' ')[0]}, ready to study?` : 'Your AI Study Assistant'}
           </motion.h3>
@@ -109,7 +109,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="text-slate-400 text-sm mb-8 text-center"
+            className="text-slate-400 dark:text-slate-500 text-sm mb-8 text-center"
           >
             Ask anything — homework, concepts, exam prep, or essays
           </motion.p>
@@ -129,13 +129,13 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
                 whileHover={{ y: -3, backgroundColor: '#f8fafc', borderColor: '#34d399' }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleSuggestion(s.text)}
-                className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md group"
+                className="flex items-start gap-4 bg-white dark:bg-[#1a1b23] border border-gray-200 dark:border-gray-700 rounded-2xl p-4 text-left transition-all shadow-sm hover:shadow-md group"
               >
                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-slate-50 border border-slate-100 group-hover:bg-emerald-50 group-hover:border-emerald-100 transition-colors flex-shrink-0">
                   <span className="text-lg">{s.emoji}</span>
                 </div>
                 <div className="flex flex-col justify-center min-h-[40px]">
-                  <span className="text-[0.9rem] font-medium text-slate-700 group-hover:text-emerald-800 transition-colors leading-snug">{s.text}</span>
+                  <span className="text-[0.9rem] font-medium text-slate-700 dark:text-slate-300 group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition-colors leading-snug">{s.text}</span>
                 </div>
               </motion.button>
             ))}
@@ -146,7 +146,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
           {hiddenCount > 0 && (
             <button
               onClick={() => setVisibleCount(c => c + 50)}
-              className="mx-auto mb-4 px-4 py-1.5 text-xs text-slate-500 bg-white border border-gray-200 rounded-full hover:bg-slate-50 transition-colors"
+              className="mx-auto mb-4 px-4 py-1.5 text-xs text-slate-500 bg-white dark:bg-[#1a1b23] border border-gray-200 dark:border-gray-700 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
             >
               ↑ Load {Math.min(50, hiddenCount)} earlier messages
             </button>
@@ -170,7 +170,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
               <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-800 to-emerald-600 flex items-center justify-center flex-shrink-0 mt-2 shadow-sm border border-emerald-900/20">
                 <span className="text-white text-[9px] font-black">SA</span>
               </div>
-              <div className="bg-[#f9fafb] p-4 rounded-2xl shadow-sm border border-slate-200">
+              <div className="bg-[#f9fafb] dark:bg-[#1a1b23] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700">
                 <TypingIndicator />
               </div>
             </motion.div>
@@ -187,7 +187,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             onClick={() => scrollToBottom('smooth')}
-            className="fixed bottom-32 left-[calc(50%+140px)] md:left-[calc(50%+160px)] -translate-x-1/2 p-2.5 bg-white border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-emerald-700 rounded-full hover:bg-slate-50 hover:text-emerald-900 transition-colors z-20"
+            className="fixed bottom-32 left-[calc(50%+140px)] md:left-[calc(50%+160px)] -translate-x-1/2 p-2.5 bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-emerald-700 dark:text-emerald-400 rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-emerald-900 transition-colors z-20"
             title="Scroll to bottom"
           >
             <ArrowDown size={18} strokeWidth={2.5} />

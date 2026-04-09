@@ -112,18 +112,18 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
             )}
           </div>
         ) : (
-          <div className="message-assistant w-full border border-slate-200 bg-[#f9fafb] p-5 rounded-2xl shadow-sm">
+          <div className="message-assistant w-full border border-slate-200 dark:border-gray-700 bg-[#f9fafb] dark:bg-[#1a1b23] p-5 rounded-2xl shadow-sm">
             <div className="prose prose-sm max-w-none prose-p:leading-loose max-w-[100%] overflow-x-hidden">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkMath]}
                 rehypePlugins={[rehypeKatex]}
                 components={{
-                  h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-slate-900">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-slate-900">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-slate-800">{children}</h3>,
-                  p: ({ children }) => <p className="mb-2.5 last:mb-0 text-slate-700 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside mb-2.5 space-y-1 text-slate-700">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside mb-2.5 space-y-1 text-slate-700">{children}</ol>,
+                  h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-slate-900 dark:text-white">{children}</h1>,
+                  h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-slate-900 dark:text-white">{children}</h2>,
+                  h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-slate-800 dark:text-slate-200">{children}</h3>,
+                  p: ({ children }) => <p className="mb-2.5 last:mb-0 text-slate-700 dark:text-slate-300 leading-relaxed">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ol>,
                   li: ({ node, children, ...props }) => {
                     // task list item — remark-gfm adds a checkbox input as first child
                     if (node?.children?.[0]?.type === 'element' && node.children[0].tagName === 'input') {
@@ -139,8 +139,8 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
                       className="mt-0.5 h-3.5 w-3.5 rounded accent-emerald-700 flex-shrink-0"
                     />
                   ),
-                  strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
-                  em: ({ children }) => <em className="italic text-slate-600">{children}</em>,
+                  strong: ({ children }) => <strong className="font-semibold text-slate-900 dark:text-white">{children}</strong>,
+                  em: ({ children }) => <em className="italic text-slate-600 dark:text-slate-400">{children}</em>,
                   del: ({ children }) => <del className="line-through text-slate-400">{children}</del>,
                   a: ({ href, children }) => (
                     <a
@@ -187,7 +187,7 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
                   tbody: ({ children }) => <tbody>{children}</tbody>,
                   tr: ({ children }) => <tr className="border-b border-slate-100 last:border-0">{children}</tr>,
                   th: ({ children }) => <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{children}</th>,
-                  td: ({ children }) => <td className="px-4 py-2.5 text-slate-700">{children}</td>,
+                  td: ({ children }) => <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{children}</td>,
                 }}
               >
                 {message.content}
@@ -197,7 +197,7 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
             
             {/* AI Action Bar */}
             {!message.streaming && (
-              <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-100">
+              <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-gray-700">
                 <div className="flex flex-wrap items-center justify-between gap-2 opacity-60 hover:opacity-100 transition-opacity">
                   <div className="flex items-center gap-1.5 -ml-1.5">
                     <button 
@@ -237,13 +237,13 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
                   <div className="flex flex-wrap gap-2 mt-1">
                     <button 
                       onClick={() => onQuickReply?.("Explain your last message like I'm 5 years old")}
-                      className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
+                      className="flex items-center gap-1.5 bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-700 text-slate-600 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 dark:hover:border-emerald-800 hover:text-emerald-700 dark:hover:text-emerald-400 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
                     >
                       <Lightbulb size={12} /> Explain like I'm 5
                     </button>
                     <button 
                       onClick={() => onQuickReply?.("Can you give me a real-world example of this?")}
-                      className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-700 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
+                      className="flex items-center gap-1.5 bg-white dark:bg-[#1a1b23] border border-slate-200 dark:border-gray-700 text-slate-600 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:border-sky-200 dark:hover:border-sky-800 hover:text-sky-700 dark:hover:text-sky-400 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
                     >
                       <Layers size={12} /> Give an example
                     </button>

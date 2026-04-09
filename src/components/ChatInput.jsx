@@ -220,7 +220,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
   return (
     <div className="relative w-full">
       {/* Fade the background so text looks like it slides under the input */}
-      <div className="absolute -top-12 left-0 w-full h-12 bg-gradient-to-t from-[#f8fafc] to-transparent pointer-events-none z-10" />
+      <div className="absolute -top-12 left-0 w-full h-12 bg-gradient-to-t from-[#f8fafc] dark:from-[#0f1117] to-transparent pointer-events-none z-10" />
 
       {/* Stop generating pill button floating above the input */}
       <AnimatePresence>
@@ -297,10 +297,10 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
 
       {/* Unified input pill */}
-      <div className={`bg-white rounded-2xl border transition-all duration-200 shadow-md shadow-black/[0.04] ${
+      <div className={`bg-white dark:bg-[#1a1b23] rounded-2xl border transition-all duration-200 shadow-md shadow-black/[0.04] ${
         disabled
-          ? 'border-gray-100 opacity-60'
-          : 'border-gray-200/80 hover:border-gray-300 focus-within:border-emerald-700/30 focus-within:shadow-lg focus-within:shadow-emerald-900/[0.05]'
+          ? 'border-gray-100 dark:border-gray-800 opacity-60'
+          : 'border-gray-200/80 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 focus-within:border-emerald-700/30 dark:focus-within:border-emerald-600/40 focus-within:shadow-lg focus-within:shadow-emerald-900/[0.05]'
       }`}>
         <div className="flex items-center px-3 gap-1">
           {isAuthenticated && (
@@ -365,7 +365,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
               : 'Ask anything about your studies...'
             }
             disabled={disabled}
-            className={`flex-1 bg-transparent outline-none text-slate-800 text-sm placeholder:text-slate-400 py-4 min-w-0 resize-none overflow-hidden leading-relaxed ${
+            className={`flex-1 bg-transparent outline-none text-slate-800 dark:text-slate-200 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 py-4 min-w-0 resize-none overflow-hidden leading-relaxed ${
               !isAuthenticated ? 'cursor-pointer' : ''
             }`}
           />

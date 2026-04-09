@@ -2,19 +2,21 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { useTheme } from '../context/ThemeContext'
 import { SEOHelmet } from '../components/SEOHelmet'
 import AuthModal from '../components/AuthModal'
 import ChatWindow from '../components/ChatWindow'
 import ChatInput from '../components/ChatInput'
 import PaywallModal from '../components/PaywallModal'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText, Trash2 } from 'lucide-react'
+import { LogOut, Plus, MessageSquare, Menu, X, LayoutDashboard, FileText, Trash2, Sun, Moon } from 'lucide-react'
 import StudyTimer from '../components/StudyTimer'
 
 export default function ChatPage() {
   const navigate = useNavigate()
   const { user, loading: authLoading, logout, streak } = useAuth()
   const { chatCount, tokenCount, tokenLimit, statsLoading, fetchChatCount, resetChat, loadHistory, historyLoading, deleteChat, deleteAllChats, recentChats, fetchRecentChats, chatsHasMore, loadMoreChats } = useChat()
+  const { toggleTheme, isDark } = useTheme()
 
   const [showPaywall, setShowPaywall] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -44,7 +46,7 @@ export default function ChatPage() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#f8fafc]">
+      <div className="flex items-center justify-center min-h-screen bg-[#f8fafc] dark:bg-[#0f1117]">
         <div className="h-10 w-10 border-4 border-slate-200 border-t-emerald-600 rounded-full animate-spin" />
       </div>
     )
@@ -214,7 +216,7 @@ export default function ChatPage() {
         url="https://everlearn.ai/chat"
         keywords="AI homework help, tutoring, exam prep, study assistant, Q&A"
       />
-      <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+      <div className="flex h-screen bg-[#f8fafc] dark:bg-[#0f1117] overflow-hidden transition-colors duration-300">
 
       {/* ── Sidebar: always visible on md+, hidden on mobile ── */}
       <div className="hidden md:flex w-64 flex-shrink-0 flex-col bg-[#111111] overflow-hidden">
@@ -250,22 +252,28 @@ export default function ChatPage() {
       </AnimatePresence>
 
       {/* ── Main Chat Area ── */}
-      <div className="flex-1 flex flex-col bg-[#f8fafc] overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col bg-[#f8fafc] dark:bg-[#0f1117] overflow-hidden min-w-0 transition-colors duration-300">
 
         {/* Top bar */}
-        <div className="px-4 md:px-6 py-3.5 border-b border-slate-200 bg-white/80 backdrop-blur-sm flex items-center justify-between flex-shrink-0 gap-2">
+        <div className="px-4 md:px-6 py-3.5 border-b border-slate-200 dark:border-gray-800 bg-white/80 dark:bg-[#1a1b23]/80 backdrop-blur-sm flex items-center justify-between flex-shrink-0 gap-2">
           <div className="flex items-center gap-3 min-w-0">
             {/* Hamburger — mobile only */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
+              className="md:hidden p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors flex-shrink-0"
             >
               <Menu size={20} />
             </button>
-            <h2 className="text-slate-700 font-semibold text-sm truncate">New Conversation</h2>
+            <h2 className="text-slate-700 dark:text-slate-200 font-semibold text-sm truncate">New Conversation</h2>
           </div>
-          <div className="flex-shrink-0">
-            {/* Removed FREE_LIMIT chat count display and upgrade prompt */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
           </div>
         </div>
 
