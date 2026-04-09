@@ -218,12 +218,35 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
   }
 
   return (
-    <motion.form
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      onSubmit={handleSubmit}
-      className="px-4 pb-5 pt-2 max-w-3xl mx-auto w-full"
-    >
+    <div className="relative w-full">
+      {/* Fade the background so text looks like it slides under the input */}
+      <div className="absolute -top-12 left-0 w-full h-12 bg-gradient-to-t from-[#f8fafc] to-transparent pointer-events-none z-10" />
+
+      {/* Stop generating pill button floating above the input */}
+      <AnimatePresence>
+        {isStreaming && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: -20, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="absolute left-1/2 -top-4 -translate-x-1/2 z-20"
+          >
+            <button
+              onClick={stopGenerating}
+              className="flex items-center gap-2 justify-center px-4 py-1.5 bg-slate-800 text-white hover:bg-slate-700 transition-colors shadow-md rounded-full text-xs font-semibold tracking-wide border border-slate-700"
+            >
+              <Square size={10} fill="currentColor" /> Stop generating
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.form
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        onSubmit={handleSubmit}
+        className="px-4 pb-5 pt-2 max-w-3xl mx-auto w-full relative z-20"
+      >
       {/* Attachment badges + errors */}
       <AnimatePresence>
         {imagePreview && (
@@ -347,39 +370,28 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
             }`}
           />
 
-          {isStreaming ? (
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.93 }}
-              onClick={stopGenerating}
-              title="Stop generating"
-              className="flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white transition-all"
-            >
-              <Square size={13} fill="currentColor" />
-            </motion.button>
-          ) : (
-            <motion.button
-              whileHover={canSend ? { scale: 1.08 } : {}}
-              whileTap={canSend ? { scale: 0.93 } : {}}
-              type="submit"
-              disabled={!canSend}
-              onClick={!isAuthenticated ? () => onLoginClick?.() : undefined}
-              className={`flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
-                canSend
-                  ? 'bg-gradient-to-br from-emerald-900 to-emerald-600 text-white shadow-sm shadow-emerald-900/25'
-                  : 'bg-gray-100 text-slate-300'
-              }`}
-            >
-              {loading ? (
-                <div className="animate-spin h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full" />
-              ) : !isAuthenticated ? (
-                <LogIn size={15} />
-              ) : (
-                <Send size={15} />
-              )}
-            </motion.button>
-          )}
+          <motion.button
+            whileHover={canSend ? { scale: 1.08 } : {}}
+            whileTap={canSend ? { scale: 0.93 } : {}}
+            type="submit"
+            disabled={!canSend}
+            onClick={!isAuthenticated ? () => onLoginClick?.() : undefined}
+            className={`flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition-all ${
+              loading || isStreaming
+                ? 'bg-slate-100 text-slate-400'
+                : canSend
+                ? 'bg-gradient-to-br from-emerald-900 to-emerald-600 text-white shadow-[0_2px_8px_rgb(6,78,59,0.3)]'
+                : 'bg-slate-100 text-slate-300'
+            }`}
+          >
+            {loading && !isStreaming ? (
+              <div className="animate-spin h-3.5 w-3.5 border-2 border-slate-300 border-t-slate-500 rounded-full" />
+            ) : !isAuthenticated ? (
+              <LogIn size={15} />
+            ) : (
+              <Send size={15} />
+            )}
+          </motion.button>
         </div>
       </div>
 
@@ -400,6 +412,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
           </p>
         )}
       </div>
-    </motion.form>
+      </motion.form>
+    </div>
   )
 }

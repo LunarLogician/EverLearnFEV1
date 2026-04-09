@@ -53,11 +53,11 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.18 }}
-      className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'} mb-5`}
+      className={`flex gap-3 sm:gap-4 ${isUser ? 'justify-end' : 'justify-start'} mb-8`}
     >
       {/* AI avatar */}
       {!isUser && (
-        <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-emerald-800 to-emerald-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-sm flex-shrink-0">
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-800 to-emerald-600 flex items-center justify-center flex-shrink-0 mt-2 shadow-sm border border-emerald-900/20">
           <span className="text-white text-[9px] font-black">SA</span>
         </div>
       )}
@@ -83,8 +83,8 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
             )}
           </div>
         ) : (
-          <div className="message-assistant">
-            <div className="prose prose-sm max-w-none">
+          <div className="message-assistant w-full border border-slate-200 bg-[#f9fafb] p-5 rounded-2xl shadow-sm">
+            <div className="prose prose-sm max-w-none prose-p:leading-loose">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
