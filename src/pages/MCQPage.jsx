@@ -214,6 +214,16 @@ function MCQGeneratorModal({ onClose, onCreated, onStartMCQ }) {
   );
 }
 
+// ── Shuffle function ─────────────────────────────────────────────────────────
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 // ── MCQ Take Modal ────────────────────────────────────────────────────────────
 function MCQTakeModal({ mcq, onClose, onComplete }) {
   const [selections, setSelections] = useState({});
@@ -221,6 +231,12 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const [shuffledQuestions, setShuffledQuestions] = useState(() => {
+    return mcq.questions.map((q) => ({
+      ...q,
+      shuffledOptions: shuffleArray(q.options),
+    }));
+  });
 
   const answeredCount = Object.keys(selections).length;
   const total = mcq.questions.length;
@@ -234,7 +250,16 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
   const handleSubmit = async () => {
     setLoading(true); setError(null);
     try {
-      const userAnswers = mcq.questions.map((_, idx) => selections[idx] || null);
+      const userAnswers = mcq.questions.map((q, idx) => {
+        const selectedDisplayOption = selections[idx];
+        if (!selectedDisplayOption) return null;
+        
+        // Map from display position back to original option
+        const displayIdx = selectedDisplayOption.charCodeAt(0) - 65; // Convert A,B,C,D to 0,1,2,3
+        const originalOption = shuffledQuestions[idx].shuffledOptions[displayIdx];
+        const originalIdx = mcq.questions[idx].options.indexOf(originalOption);
+        return String.fromCharCode(65 + originalIdx); // Convert back to A,B,C,D
+      });
       const res = await mcqService.submitAnswers(mcq._id || mcq.mcqId, userAnswers);
       setResults(res.results);
       setSubmitted(true);
@@ -271,7 +296,7 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
         )}
 
         <div className="overflow-y-auto flex-1 px-4 sm:px-6 py-4 sm:py-6 space-y-6 sm:space-y-8">
-          {mcq.questions.map((q, questionIdx) => {
+          {shuffledQuestions.map((q, questionIdx) => {
             const userAnswer = selections[questionIdx];
             const correctAnswer = results?.[questionIdx]?.correctAnswer?.toUpperCase();
             const isCorrect = results?.[questionIdx]?.isCorrect;
@@ -284,7 +309,7 @@ function MCQTakeModal({ mcq, onClose, onComplete }) {
                   <p className="text-slate-800 font-semibold text-sm sm:text-base leading-relaxed">{q.question}</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {q.options.map((opt, optIdx) => {
+                  {q.shuffledOptions.map((opt, optIdx) => {
                     const optionLabel = String.fromCharCode(65 + optIdx);
                     const isSelected = userAnswer === optionLabel;
                     let style = 'border-gray-200 text-slate-700 hover:border-purple-400 hover:bg-purple-50';

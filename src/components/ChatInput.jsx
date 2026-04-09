@@ -47,6 +47,17 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
     return () => { if (pollRef.current) clearTimeout(pollRef.current) }
   }, [])
 
+  // Refocus input automatically when AI finishes responding
+  useEffect(() => {
+    if (!loading && !isStreaming && isAuthenticated && !disabled) {
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }, 50)
+    }
+  }, [loading, isStreaming, isAuthenticated, disabled])
+
   const processImage = useCallback((file) => {
     setImageError(null)
     if (file.size > 5 * 1024 * 1024) {
@@ -160,9 +171,16 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       const docId = uploadedDoc?.id || null
       const docInfo = uploadedDoc ? { name: uploadedDoc.name, type: uploadedDoc.name.split('.').pop().toUpperCase() } : null
       const imgData = imageBase64 || null
+      
       setInput('')
-      if (inputRef.current) inputRef.current.style.height = 'auto'
-      inputRef.current?.focus()
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto'
+      }
+      
+      setTimeout(() => {
+        if (inputRef.current) inputRef.current.focus()
+      }, 0)
+
       if (uploadedDoc) removeDoc()
       if (imageBase64) removeImage()
       await sendMessage(text, docId, docInfo, imgData)
@@ -323,7 +341,7 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
               : uploadedDoc ? 'Waiting for document to process...'
               : 'Ask anything about your studies...'
             }
-            disabled={loading || disabled}
+            disabled={disabled}
             className={`flex-1 bg-transparent outline-none text-slate-800 text-sm placeholder:text-slate-400 py-4 min-w-0 resize-none overflow-hidden leading-relaxed ${
               !isAuthenticated ? 'cursor-pointer' : ''
             }`}
