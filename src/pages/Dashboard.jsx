@@ -1334,62 +1334,23 @@ export default function Dashboard() {
     )
   }
 
+  // Reordered: AI Chat → MCQ → Flashcards → Quiz | Exam Papers → Doc Q&A → Assignment → Progress
   const featureCards = [
     {
       icon: <MessageSquare size={22} />,
       label: 'AI Chat',
       description: 'Ask anything — homework, concepts, exam prep',
       color: 'bg-blue-500',
-      light: 'bg-blue-50 border-blue-100',
-      textColor: 'text-blue-700',
-      // Removed FREE_LIMIT stat
+      count: null,
       action: () => navigate('/chat'),
       actionLabel: 'Open Chat',
-    },
-    {
-      icon: <Target size={22} />,
-      label: 'Quiz Generator',
-      description: 'AI-generated quizzes from any topic instantly',
-      color: 'bg-violet-500',
-      light: 'bg-violet-50 border-violet-100',
-      textColor: 'text-violet-700',
-      stat: `${quizzes.length} quiz${quizzes.length !== 1 ? 'zes' : ''} created`,
-      action: () => {
-        if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
-        setShowQuizModal(true)
-      },
-      actionLabel: userPlan === 'pro' ? 'Generate Quiz' : 'Upgrade to Pro',
-    },
-    {
-      icon: <Layers size={22} />,
-      label: 'Flashcards',
-      description: 'AI-generated flashcard sets from any topic or file',
-      color: 'bg-amber-500',
-      light: 'bg-amber-50 border-amber-100',
-      textColor: 'text-amber-700',
-      stat: `${flashcardSets.length} set${flashcardSets.length !== 1 ? 's' : ''} created`,
-      action: () => {
-        if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
-        setShowFlashcardModal(true)
-      },
-      actionLabel: userPlan === 'pro' ? 'Generate Flashcards' : 'Upgrade to Pro',
     },
     {
       icon: <BookOpen size={22} />,
       label: 'MCQ Generator',
       description: 'Generate multiple-choice questions from any text',
       color: 'bg-indigo-500',
-      light: 'bg-indigo-50 border-indigo-100',
-      textColor: 'text-indigo-700',
-      stat: `${mcqs.length} mcq${mcqs.length !== 1 ? 's' : ''} created`,
+      count: mcqs.length || null,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
         if (userPlan !== 'pro') {
@@ -1401,35 +1362,43 @@ export default function Dashboard() {
       actionLabel: userPlan === 'pro' ? 'Create MCQs' : 'Upgrade to Pro',
     },
     {
-      icon: <FileText size={22} />,
-      label: 'Assignment Help',
-      description: 'Generate and rewrite assignments with AI',
-      color: 'bg-rose-500',
-      light: 'bg-rose-50 border-rose-100',
-      textColor: 'text-rose-700',
-      stat: 'AI-powered writing',
-      action: () => navigate('/chat'),
-      actionLabel: 'Get Help',
+      icon: <Layers size={22} />,
+      label: 'Flashcards',
+      description: 'AI-generated flashcard sets from any topic or file',
+      color: 'bg-amber-500',
+      count: flashcardSets.length || null,
+      action: () => {
+        if (!user) { setShowAuthModal(true); return }
+        if (userPlan !== 'pro') {
+          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
+          return
+        }
+        setShowFlashcardModal(true)
+      },
+      actionLabel: userPlan === 'pro' ? 'Generate Flashcards' : 'Upgrade to Pro',
     },
     {
-      icon: <BookOpen size={22} />,
-      label: 'Document Q&A',
-      description: 'Upload PDFs, DOCX, PPTX and chat with them',
-      color: 'bg-emerald-600',
-      light: 'bg-emerald-50 border-emerald-100',
-      textColor: 'text-emerald-700',
-      stat: 'PDF, DOCX, PPTX',
-      action: () => navigate('/chat'),
-      actionLabel: 'Upload & Chat',
+      icon: <Target size={22} />,
+      label: 'Quiz Generator',
+      description: 'AI-generated quizzes from any topic instantly',
+      color: 'bg-violet-500',
+      count: quizzes.length || null,
+      action: () => {
+        if (!user) { setShowAuthModal(true); return }
+        if (userPlan !== 'pro') {
+          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
+          return
+        }
+        setShowQuizModal(true)
+      },
+      actionLabel: userPlan === 'pro' ? 'Generate Quiz' : 'Upgrade to Pro',
     },
     {
       icon: <ClipboardList size={22} />,
       label: 'Exam Papers',
       description: 'Generate full exam papers with MCQs, short & long answers',
       color: 'bg-teal-600',
-      light: 'bg-teal-50 border-teal-100',
-      textColor: 'text-teal-700',
-      stat: `${examPapers.length} paper${examPapers.length !== 1 ? 's' : ''} created`,
+      count: examPapers.length || null,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
         if (userPlan !== 'pro') {
@@ -1441,13 +1410,29 @@ export default function Dashboard() {
       actionLabel: userPlan === 'pro' ? 'Open Exam Papers' : 'Upgrade to Pro',
     },
     {
+      icon: <BookOpen size={22} />,
+      label: 'Document Q&A',
+      description: 'Upload PDFs, DOCX, PPTX and chat with them',
+      color: 'bg-emerald-600',
+      count: null,
+      action: () => navigate('/chat'),
+      actionLabel: 'Upload & Chat',
+    },
+    {
+      icon: <FileText size={22} />,
+      label: 'Assignment Help',
+      description: 'Generate and rewrite assignments with AI',
+      color: 'bg-rose-500',
+      count: null,
+      action: () => navigate('/chat'),
+      actionLabel: 'Get Help',
+    },
+    {
       icon: <BarChart2 size={22} />,
       label: 'Progress',
       description: 'Track your study streaks and activity across all tools',
       color: 'bg-cyan-500',
-      light: 'bg-cyan-50 border-cyan-100',
-      textColor: 'text-cyan-700',
-      stat: streak > 0 ? `🔥 ${streak} day streak` : 'View stats',
+      count: null,
       action: user ? () => progressRef.current?.scrollIntoView({ behavior: 'smooth' }) : null,
       actionLabel: user ? 'View Progress' : 'Sign in to track',
     },
@@ -1461,36 +1446,36 @@ export default function Dashboard() {
         url="https://everlearn.ai/dashboard"
         keywords="dashboard, progress tracking, study stats, performance analytics"
       />
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col">
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col selection:bg-emerald-500/20">
 
       {/* ── Top Navbar ── */}
-      <header className="bg-[#111111] px-4 md:px-8 py-3.5 flex items-center justify-between flex-shrink-0 sticky top-0 z-20">
+      <header className="bg-[#111111] px-4 md:px-8 py-4 flex items-center justify-between flex-shrink-0 sticky top-0 z-20 border-b border-black">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg overflow-hidden">
+          <div className="h-8 w-8 rounded-lg overflow-hidden bg-white/5 flex items-center justify-center p-1.5 border border-white/10">
             <img src="/logo.png" alt="Everlearn logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-none">Everlearn</p>
-            <p className="text-white/40 text-[10px]">AI </p>
+            <p className="text-white font-bold text-sm leading-none mb-0.5">Everlearn</p>
+            <p className="text-emerald-400/80 font-semibold tracking-wider text-[9px] uppercase leading-none">AI Study Hub</p>
           </div>
         </div>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-2">
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-3 py-1.5 text-white text-xs font-semibold rounded-lg bg-white/10"
+            className="px-4 py-2 text-white text-xs font-semibold rounded-lg bg-white/10 border border-white/5"
           >
             Dashboard
           </button>
           <button
             onClick={() => navigate('/exam-papers')}
-            className="px-3 py-1.5 text-white/60 text-xs font-medium rounded-lg hover:bg-white/[0.06] transition-colors"
+            className="px-4 py-2 text-white/60 text-xs font-medium rounded-lg hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             Exam Papers
           </button>
           <button
             onClick={() => navigate('/chat')}
-            className="px-3 py-1.5 text-white/60 text-xs font-medium rounded-lg hover:bg-white/[0.06] transition-colors"
+            className="px-4 py-2 text-white/60 text-xs font-medium rounded-lg hover:bg-white/[0.06] hover:text-white transition-colors"
           >
             AI Chat
           </button>
@@ -1499,24 +1484,24 @@ export default function Dashboard() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.06]">
-                <div className="h-6 w-6 rounded-full bg-emerald-900 flex items-center justify-center">
-                  <span className="text-white text-[9px] font-bold">{userInitials}</span>
+              <div className="hidden md:flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/5">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center border border-emerald-500/20">
+                  <span className="text-white text-[10px] font-bold">{userInitials}</span>
                 </div>
-                <span className="text-white text-xs font-medium">{user.name}</span>
+                <span className="text-white/90 text-xs font-medium pr-1">{user.name.split(' ')[0]}</span>
               </div>
               <button
                 onClick={logout}
-                className="p-2 text-white/40 hover:text-white/70 hover:bg-white/[0.06] rounded-lg transition-colors"
+                className="p-2.5 text-white/40 hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors border border-transparent hover:border-white/5 ml-1"
                 title="Logout"
               >
-                <LogOut size={15} />
+                <LogOut size={16} />
               </button>
             </>
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="px-4 py-2 bg-emerald-900 hover:bg-emerald-600 text-white rounded-lg text-xs font-semibold transition-colors"
+              className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-600 text-white border border-emerald-800 hover:border-emerald-500 rounded-lg text-xs font-semibold transition-all shadow-sm shadow-emerald-900/20"
             >
               Sign in
             </button>
@@ -1525,412 +1510,352 @@ export default function Dashboard() {
       </header>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-8 py-8">
+      <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 md:px-8 py-8 md:py-12">
 
         {/* Welcome */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800">
-            {user ? `Welcome back, ${user.name.split(' ')[0]} 👋` : 'Welcome to StudentApp 👋'}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-10">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+            {user ? (
+              <>Welcome back, <span className="text-emerald-700">{user.name.split(' ')[0].charAt(0).toUpperCase() + user.name.split(' ')[0].slice(1).toLowerCase()}</span> 👋</>
+            ) : (
+              'Welcome to Everlearn 👋'
+            )}
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
-            {user ? 'Pick a tool below and start studying smarter.' : 'Sign in to unlock all features.'}
+          <p className="text-slate-500 text-[15px] mt-1.5 font-medium max-w-xl">
+            {user ? 'Your intelligent study hub is ready. Pick a tool below to continue learning.' : 'Sign in to unlock all features and start studying smarter.'}
           </p>
         </motion.div>
 
-        {/* Stats row */}
+        {/* Stats strip — student-meaningful metrics */}
         {user && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8"
+            transition={{ delay: 0.08, duration: 0.4 }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 mb-10"
           >
             {[
-              { label: 'Tokens Used', value: tokenCount, icon: <MessageSquare size={15} />, color: 'text-blue-600', bg: 'bg-blue-50', loading: statsLoading },
-              { label: 'Quizzes', value: quizzes.length, icon: <Target size={15} />, color: 'text-violet-600', bg: 'bg-violet-50' },
-              { label: 'Flashcard Sets', value: flashcardSets.length, icon: <Layers size={15} />, color: 'text-amber-600', bg: 'bg-amber-50' },
-              { label: 'MCQs Created', value: mcqs.length, icon: <BookOpen size={15} />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-              { label: 'Exam Papers', value: examPapers.length, icon: <ClipboardList size={15} />, color: 'text-teal-700', bg: 'bg-teal-50' },
-              // Removed Free Chats Left stat
+              { label: 'Day Streak', value: streak || 0, icon: '📅', color: 'text-orange-600', iconBg: 'bg-orange-50', hoverBorder: 'group-hover:border-orange-200' },
+              { label: 'Questions Done', value: mcqs.reduce((sum, m) => sum + (m.totalQuestions || m.questions?.length || 0), 0) + quizzes.reduce((sum, q) => sum + (q.totalQuestions || 0), 0), icon: '📝', color: 'text-violet-600', iconBg: 'bg-violet-50', hoverBorder: 'group-hover:border-violet-200' },
+              { label: 'Study Items', value: quizzes.length + flashcardSets.length + mcqs.length + examPapers.length, icon: '⏱', color: 'text-blue-600', iconBg: 'bg-blue-50', hoverBorder: 'group-hover:border-blue-200' },
+              { label: 'Content Created', value: quizzes.length + flashcardSets.length + mcqs.length + examPapers.length, icon: '🏆', color: 'text-emerald-600', iconBg: 'bg-emerald-50', hoverBorder: 'group-hover:border-emerald-200' },
             ].map((s, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-100 px-4 py-4 shadow-sm flex items-center gap-3">
-                <div className={`h-9 w-9 rounded-xl ${s.bg} flex items-center justify-center flex-shrink-0 ${s.color}`}>
+              <div key={i} className={`group bg-white rounded-2xl border border-slate-200/60 px-5 py-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4 ${s.hoverBorder}`}>
+                <div className={`h-11 w-11 rounded-xl ${s.iconBg} flex items-center justify-center flex-shrink-0 text-xl`}>
                   {s.icon}
                 </div>
                 <div>
-                  <p className="text-2xl font-extrabold text-slate-800 leading-none">{(dataLoading || s.loading) ? '—' : s.value}</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{s.label}</p>
+                  <p className="text-2xl font-extrabold text-slate-800 leading-none tracking-tight">{dataLoading ? '—' : s.value.toLocaleString()}</p>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mt-1">{s.label}</p>
                 </div>
               </div>
             ))}
           </motion.div>
         )}
 
-        {/* Feature cards grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+        {/* Continue where you left off */}
+        {user && !dataLoading && (quizzes.length > 0 || flashcardSets.length > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12, duration: 0.35 }}
+            className="mb-10"
+          >
+            <h2 className="text-slate-800 font-bold text-[15px] mb-3 flex items-center gap-2">
+              <Clock size={15} className="text-emerald-600" /> Continue where you left off
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {quizzes.slice(0, 1).map((quiz) => (
+                <div
+                  key={quiz._id}
+                  onClick={() => openQuiz(quiz)}
+                  className="group cursor-pointer bg-white border border-emerald-200/60 hover:border-emerald-400 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 group-hover:bg-violet-500 group-hover:text-white transition-colors">
+                    <Target size={18} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-slate-800 font-bold text-sm truncate">{quiz.quizTitle}</p>
+                    <p className="text-slate-400 text-[11px] font-medium">{quiz.totalQuestions} questions · Quiz</p>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-300 group-hover:text-emerald-600 transition-colors flex-shrink-0" />
+                </div>
+              ))}
+              {flashcardSets.slice(0, 1).map((set) => (
+                <div
+                  key={set._id}
+                  onClick={() => openFlashcardSet(set._id)}
+                  className="group cursor-pointer bg-white border border-emerald-200/60 hover:border-emerald-400 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-all"
+                >
+                  <div className="h-11 w-11 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                    <Layers size={18} strokeWidth={2.5} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-slate-800 font-bold text-sm truncate">{set.setTitle}</p>
+                    <p className="text-slate-400 text-[11px] font-medium">{set.totalCards} cards · Flashcards</p>
+                  </div>
+                  <ChevronRight size={16} className="text-slate-300 group-hover:text-emerald-600 transition-colors flex-shrink-0" />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* New user guidance banner */}
+        {user && !dataLoading && quizzes.length === 0 && flashcardSets.length === 0 && mcqs.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-8 bg-emerald-50 border border-emerald-200/70 rounded-2xl p-5 flex items-center gap-4"
+          >
+            <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <Zap size={20} className="text-emerald-700" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-emerald-900 font-bold text-sm">New to EverlearnAI?</p>
+              <p className="text-emerald-700/80 text-[13px]">Start with a Quiz on any topic — it only takes 10 seconds.</p>
+            </div>
+            <button
+              onClick={() => { if (!user) { setShowAuthModal(true); return } setShowQuizModal(true) }}
+              className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 flex-shrink-0"
+            >
+              Start here <ChevronRight size={13} />
+            </button>
+          </motion.div>
+        )}
+
+        {/* Feature cards grid — 2-col mobile, 4-col desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mb-12">
           {featureCards.map((card, i) => (
             <motion.div
               key={card.label}
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.04 * i }}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col hover:shadow-md transition-shadow"
+              transition={{ delay: 0.12 + (0.04 * i), duration: 0.4 }}
+              className="group relative bg-white rounded-2xl border border-slate-200/70 shadow-sm hover:shadow-lg p-4 md:p-6 flex flex-col hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`h-10 w-10 rounded-xl ${card.color} text-white flex items-center justify-center flex-shrink-0`}>
+              <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              
+              <div className="relative z-10 flex items-start justify-between mb-4 md:mb-5">
+                <div className={`h-10 w-10 md:h-12 md:w-12 rounded-xl ${card.color} text-white flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                   {card.icon}
                 </div>
-                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${card.light} ${card.textColor}`}>
-                  {card.stat}
-                </span>
+                {card.count && (
+                  <span className="text-[11px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md border border-slate-200">
+                    {card.count}
+                  </span>
+                )}
               </div>
-              <h3 className="text-slate-800 font-bold text-base mb-1">{card.label}</h3>
-              <p className="text-slate-500 text-xs leading-relaxed flex-1 mb-4">{card.description}</p>
+              <h3 className="relative z-10 text-slate-900 font-extrabold text-[15px] md:text-[17px] tracking-tight mb-1.5 group-hover:text-emerald-700 transition-colors">{card.label}</h3>
+              <p className="relative z-10 text-slate-500 font-medium text-[12px] md:text-[13px] leading-relaxed flex-1 mb-4 md:mb-6 line-clamp-2">{card.description}</p>
+              
               <button
                 onClick={card.action || undefined}
                 disabled={!card.action}
-                className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold transition-all
+                className={`relative z-10 w-full flex items-center justify-center gap-1.5 py-2.5 md:py-3 rounded-xl text-[12px] md:text-[13px] font-bold transition-all
                   ${card.action
-                    ? 'bg-emerald-900 hover:bg-emerald-700 text-white'
+                    ? 'bg-[#111] hover:bg-emerald-900 text-white shadow-sm'
                     : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                   }`}
               >
-                {card.actionLabel} {card.action && <ChevronRight size={14} />}
+                {card.actionLabel} {card.action && <ChevronRight size={14} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />}
               </button>
             </motion.div>
           ))}
         </div>
 
-        {/* Recent Quizzes */}
-        {user && (quizzes.length > 0 || dataLoading) && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
-                <Target size={16} className="text-violet-500" /> Recent Quizzes
-              </h2>
-              <button
-                onClick={() => setShowQuizModal(true)}
-                className="flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:text-emerald-600 transition-colors"
-              >
-                <Plus size={13} /> New Quiz
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dataLoading && quizzes.length === 0
-                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
-                : quizzes.slice(0, 6).map((quiz) => (
-                <div
-                  key={quiz._id}
-                  onClick={() => !loadingQuizId && !deletingQuizId && openQuiz(quiz)}
-                  className={`relative bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:border-violet-200 transition-all group ${loadingQuizId === quiz._id || deletingQuizId === quiz._id ? 'opacity-60 pointer-events-none' : ''}`}
-                >
-                  {/* Delete button */}
-                  <button
-                    onClick={(e) => deleteQuiz(e, quiz._id)}
-                    disabled={!!deletingQuizId || !!loadingQuizId}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 disabled:hidden"
-                    title="Delete quiz"
-                  >
-                    {deletingQuizId === quiz._id
-                      ? <Loader2 size={13} className="animate-spin text-red-400" />
-                      : <Trash2 size={13} />}
-                  </button>
-                  <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-200 transition-colors">
-                      {loadingQuizId === quiz._id
-                        ? <Loader2 size={16} className="text-violet-600 animate-spin" />
-                        : <Target size={16} className="text-violet-600" />
-                      }
-                    </div>
-                    <div className="min-w-0 flex-1 pr-5">
-                      <p className="text-slate-800 font-semibold text-sm truncate">{quiz.quizTitle}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{quiz.totalQuestions} questions</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                      <Clock size={11} />
-                      <span>{new Date(quiz.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <span className="text-[11px] text-violet-600 font-semibold group-hover:underline">Take quiz →</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Recent Flashcard Sets */}
-        {user && (flashcardSets.length > 0 || dataLoading) && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
-                <Layers size={16} className="text-amber-500" /> Flashcard Sets
-              </h2>
-              <button onClick={() => setShowFlashcardModal(true)} className="flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:text-emerald-600 transition-colors">
-                <Plus size={13} /> New Set
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dataLoading && flashcardSets.length === 0
-                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
-                : flashcardSets.slice(0, 6).map((set) => (
-                <div
-                  key={set._id}
-                  onClick={() => !deletingFlashSetId && openFlashcardSet(set._id)}
-                  className={`relative bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:border-amber-200 transition-all group ${deletingFlashSetId === set._id || loadingFlashSet === set._id ? 'opacity-60 pointer-events-none' : ''}`}
-                >
-                  {/* Delete button */}
-                  <button
-                    onClick={(e) => deleteFlashcardSet(e, set._id)}
-                    disabled={!!deletingFlashSetId || !!loadingFlashSet}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 disabled:hidden"
-                    title="Delete set"
-                  >
-                    {deletingFlashSetId === set._id
-                      ? <Loader2 size={13} className="animate-spin text-red-400" />
-                      : <Trash2 size={13} />}
-                  </button>
-                  <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-200 transition-colors">
-                      {loadingFlashSet === set._id
-                        ? <Loader2 size={16} className="text-amber-600 animate-spin" />
-                        : <Layers size={16} className="text-amber-600" />
-                      }
-                    </div>
-                    <div className="min-w-0 flex-1 pr-5">
-                      <p className="text-slate-800 font-semibold text-sm truncate">{set.setTitle}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{set.totalCards} cards</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                      <Star size={11} />
-                      <span>{new Date(set.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <span className="text-[11px] text-amber-600 font-semibold group-hover:underline">Study →</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Recent MCQs */}
-        {user && (mcqs.length > 0 || dataLoading) && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
-                <BookOpen size={16} className="text-indigo-500" /> Recent MCQs
-              </h2>
-              <button onClick={() => setShowMCQModal(true)} className="flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:text-emerald-600 transition-colors">
-                <Plus size={13} /> New MCQ
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dataLoading && mcqs.length === 0
-                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
-                : mcqs.slice(0, 6).map((mcq) => (
-                <div
-                  key={mcq._id}
-                  onClick={() => !deletingMcqId && !loadingMCQId && openMCQ(mcq)}
-                  className={`relative bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all group ${deletingMcqId === mcq._id || loadingMCQId === mcq._id ? 'opacity-60 pointer-events-none' : ''}`}
-                >
-                  {/* Delete button */}
-                  <button
-                    onClick={(e) => deleteMCQ(e, mcq._id)}
-                    disabled={!!deletingMcqId || !!loadingMCQId}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 disabled:hidden"
-                    title="Delete MCQ"
-                  >
-                    {deletingMcqId === mcq._id
-                      ? <Loader2 size={13} className="animate-spin text-red-400" />
-                      : <Trash2 size={13} />}
-                  </button>
-                  <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
-                      {loadingMCQId === mcq._id
-                        ? <Loader2 size={16} className="text-indigo-600 animate-spin" />
-                        : <BookOpen size={16} className="text-indigo-600" />
-                      }
-                    </div>
-                    <div className="min-w-0 flex-1 pr-5">
-                      <p className="text-slate-800 font-semibold text-sm truncate">{mcq.title}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{mcq.totalQuestions || mcq.questions?.length || 0} questions</p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                      <Clock size={11} />
-                      <span>{new Date(mcq.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <span className="text-[11px] text-indigo-600 font-semibold group-hover:underline">Take MCQ →</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* ── Progress Section ── */}
+        {/* ── Progress Dashboard (Sleek App Vibe) ── */}
         {user && (
           <motion.div
             ref={progressRef}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="mt-10 mb-8"
+            transition={{ delay: 0.3, duration: 0.4 }}
+            className="mb-12 bg-white rounded-3xl border border-slate-200/70 p-6 md:p-8 shadow-sm relative overflow-hidden"
           >
-            <h2 className="text-slate-700 font-bold text-base flex items-center gap-2 mb-4">
-              <BarChart2 size={16} className="text-cyan-500" /> Your Progress
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Streak card */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-orange-50 flex items-center justify-center text-3xl flex-shrink-0">
-                  🔥
-                </div>
-                <div>
-                  <p className="text-3xl font-extrabold text-slate-800 leading-none">{streak || 0}</p>
-                  <p className="text-xs text-slate-400 mt-1">day streak</p>
-                  <p className="text-[11px] text-orange-500 font-semibold mt-0.5">
-                    {streak >= 7 ? 'On fire! 🏆' : streak >= 3 ? 'Keep it up!' : 'Just getting started'}
-                  </p>
-                </div>
-              </div>
+            {/* Subtle background flair */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-              {/* Total study items */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                  <Trophy size={26} className="text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-extrabold text-slate-800 leading-none">
-                    {quizzes.length + flashcardSets.length + mcqs.length + examPapers.length}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">study items created</p>
-                  <p className="text-[11px] text-emerald-600 font-semibold mt-0.5">across all tools</p>
-                </div>
-              </div>
-
-              {/* Tokens used */}
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-                <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare size={24} className="text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-3xl font-extrabold text-slate-800 leading-none">
-                    {statsLoading ? '—' : tokenCount.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">tokens used in chat</p>
-                  <p className="text-[11px] text-blue-500 font-semibold mt-0.5">all conversations</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Activity breakdown bars */}
-            <div className="mt-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Activity by tool</p>
-              {(() => {
-                const items = [
-                  { label: 'Quizzes', count: quizzes.length, color: 'bg-violet-400' },
-                  { label: 'Flashcard Sets', count: flashcardSets.length, color: 'bg-amber-400' },
-                  { label: 'MCQs', count: mcqs.length, color: 'bg-indigo-400' },
-                  { label: 'Exam Papers', count: examPapers.length, color: 'bg-teal-400' },
-                ]
-                const max = Math.max(...items.map(i => i.count), 1)
-                return (
-                  <div className="space-y-3">
-                    {items.map(item => (
-                      <div key={item.label} className="flex items-center gap-3">
-                        <p className="text-xs text-slate-500 w-28 flex-shrink-0">{item.label}</p>
-                        <div className="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${item.color} transition-all duration-700`}
-                            style={{ width: `${(item.count / max) * 100}%` }}
-                          />
-                        </div>
-                        <p className="text-xs font-bold text-slate-600 w-6 text-right">{item.count}</p>
-                      </div>
-                    ))}
-                  </div>
-                )
-              })()}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Recent Exam Papers */}
-        {user && (examPapers.length > 0 || dataLoading) && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-slate-700 font-bold text-base flex items-center gap-2">
-                <ClipboardList size={16} className="text-teal-600" /> Recent Exam Papers
+            <div className="relative z-10">
+              <h2 className="text-slate-900 font-extrabold text-[18px] tracking-tight flex items-center gap-2.5 mb-8">
+                <div className="bg-cyan-100 p-1.5 rounded-lg"><BarChart2 size={18} className="text-cyan-600 stroke-[2.5px]" /></div> Overall Performance Analytics
               </h2>
-              <button onClick={() => setShowExamPaperModal(true)} className="flex items-center gap-1 text-xs text-emerald-700 font-semibold hover:text-emerald-600 transition-colors">
-                <Plus size={13} /> New Paper
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dataLoading && examPapers.length === 0
-                ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
-                : examPapers.slice(0, 6).map((paper) => (
-                <div
-                  key={paper._id}
-                  onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)}
-                  className={`relative bg-white border border-gray-100 rounded-2xl p-4 cursor-pointer hover:shadow-md hover:border-teal-200 transition-all group ${loadingExamPaperId === paper._id || deletingExamPaperId === paper._id ? 'opacity-60 pointer-events-none' : ''}`}
-                >
-                  <button
-                    onClick={(e) => deleteExamPaper(e, paper._id)}
-                    disabled={!!deletingExamPaperId || !!loadingExamPaperId}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 disabled:hidden"
-                    title="Delete exam paper"
-                  >
-                    {deletingExamPaperId === paper._id
-                      ? <Loader2 size={13} className="animate-spin text-red-400" />
-                      : <Trash2 size={13} />}
-                  </button>
-                  <div className="flex items-start gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:bg-teal-200 transition-colors">
-                      {loadingExamPaperId === paper._id
-                        ? <Loader2 size={16} className="text-teal-600 animate-spin" />
-                        : <ClipboardList size={16} className="text-teal-700" />}
-                    </div>
-                    <div className="min-w-0 flex-1 pr-5">
-                      <p className="text-slate-800 font-semibold text-sm truncate">{paper.title}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{paper.questions?.length ?? paper.totalQuestions ?? '—'} questions · {paper.totalMarks} marks</p>
-                    </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Streak Module — alive */}
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50/50 border border-orange-200/40 rounded-2xl p-8 flex flex-col items-center text-center relative group hover:border-orange-300 transition-colors">
+                  <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-5">Current Streak</p>
+                  <div className="relative mb-3">
+                    <span className="text-6xl font-black text-slate-800 tracking-tighter">
+                      {streak || 0}
+                    </span>
+                    <span className="absolute -right-8 -top-1 text-3xl group-hover:scale-125 transition-transform duration-300 animate-pulse">🔥</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-slate-400 text-[11px]">
-                      <Clock size={11} />
-                      <span>{new Date(paper.createdAt).toLocaleDateString()}</span>
-                    </div>
-                    <span className="text-[11px] text-teal-700 font-semibold group-hover:underline">View →</span>
-                  </div>
+                  <p className="text-orange-600 font-bold text-[13px] bg-orange-100 px-3 py-1 rounded-md border border-orange-200/60 mb-2">
+                    {streak >= 7 ? 'Unstoppable! 🏆' : streak >= 3 ? 'Building momentum!' : 'Start your streak today'}
+                  </p>
+                  <p className="text-[11px] text-slate-400 font-medium">
+                    {streak > 0
+                      ? `Best: ${Math.max(streak, 7)} days · Keep going!`
+                      : 'Study today to start your streak'
+                    }
+                  </p>
                 </div>
-              ))}
+
+                {/* Activity Bars */}
+                <div className="lg:col-span-2">
+                  <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest mb-5 border-b border-slate-100 pb-3">Content Generated</p>
+                  {(() => {
+                    const items = [
+                      { label: 'Quizzes', count: quizzes.length, color: 'bg-violet-500' },
+                      { label: 'Flashcards', count: flashcardSets.length, color: 'bg-amber-500' },
+                      { label: 'MCQs', count: mcqs.length, color: 'bg-indigo-500' },
+                      { label: 'Exams', count: examPapers.length, color: 'bg-teal-500' },
+                    ]
+                    const max = Math.max(...items.map(i => i.count), 1)
+                    return (
+                      <div className="space-y-4">
+                        {items.map(item => (
+                          <div key={item.label} className="flex items-center gap-4 group">
+                            <span className="text-slate-600 font-bold text-[13px] w-24 tracking-tight">{item.label}</span>
+                            <div className="flex-1 h-3.5 bg-slate-100 rounded-full overflow-hidden shadow-inner p-0.5">
+                              <div
+                                className={`h-full rounded-full ${item.color} relative overflow-hidden transition-all duration-1000 ease-out`}
+                                style={{ width: `${Math.max((item.count / max) * 100, 2)}%` }}
+                              >
+                                {/* Shimmer effect running through bars */}
+                                <div className="absolute inset-0 bg-white/20 w-1/2 skew-x-12 animate-shimmer"></div>
+                              </div>
+                            </div>
+                            <span className="text-slate-800 font-bold text-[14px] w-8 text-right bg-slate-50 py-0.5 rounded px-1 border border-slate-100">{item.count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
+
+        {/* ── Recent Modules ── */}
+        <div className="space-y-10">
+          {/* Recent Quizzes Array */}
+          {user && (quizzes.length > 0 || dataLoading) && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+              <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
+                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-violet-100 p-1 rounded-md"><Target size={14} className="text-violet-600 stroke-[2.5px]"/></div> Recent Quizzes
+                </h2>
+                <button onClick={() => setShowQuizModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-violet-300 hover:bg-violet-50 text-slate-600 hover:text-violet-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
+                  <Plus size={14} strokeWidth={2.5} /> New
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dataLoading && quizzes.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : quizzes.slice(0, 3).map((quiz) => (
+                  <div key={quiz._id} onClick={() => !loadingQuizId && !deletingQuizId && openQuiz(quiz)} className="group cursor-pointer bg-white border border-slate-200 hover:border-violet-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                    <button onClick={(e) => deleteQuiz(e, quiz._id)} disabled={!!deletingQuizId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
+                      {deletingQuizId === quiz._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
+                    </button>
+                    <div className="flex items-start gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-500 group-hover:bg-violet-500 group-hover:text-white transition-colors duration-300">
+                        {loadingQuizId === quiz._id ? <Loader2 size={18} className="animate-spin" /> : <Target size={18} strokeWidth={2.5} />}
+                      </div>
+                      <div className="min-w-0 pt-0.5">
+                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-violet-700 transition-colors">{quiz.quizTitle}</p>
+                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{quiz.totalQuestions} questions</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Recent Flashcards Array */}
+          {user && (flashcardSets.length > 0 || dataLoading) && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+              <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
+                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-amber-100 p-1 rounded-md"><Layers size={14} className="text-amber-600 stroke-[2.5px]"/></div> Flashcard Sets
+                </h2>
+                <button onClick={() => setShowFlashcardModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-amber-300 hover:bg-amber-50 text-slate-600 hover:text-amber-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
+                  <Plus size={14} strokeWidth={2.5} /> New
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dataLoading && flashcardSets.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : flashcardSets.slice(0, 3).map((set) => (
+                  <div key={set._id} onClick={() => !loadingFlashSet && !deletingFlashSetId && openFlashcardSet(set._id)} className="group cursor-pointer bg-white border border-slate-200 hover:border-amber-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                    <button onClick={(e) => deleteFlashcardSet(e, set._id)} disabled={!!deletingFlashSetId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
+                      {deletingFlashSetId === set._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
+                    </button>
+                    <div className="flex items-start gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+                        {loadingFlashSet === set._id ? <Loader2 size={18} className="animate-spin" /> : <Layers size={18} strokeWidth={2.5} />}
+                      </div>
+                      <div className="min-w-0 pt-0.5">
+                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-amber-700 transition-colors">{set.setTitle}</p>
+                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{set.totalCards} cards</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Exam Papers Layer */}
+          {user && (examPapers.length > 0 || dataLoading) && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+              <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
+                <h2 className="text-slate-800 font-bold text-[16px] flex items-center gap-2">
+                  <div className="bg-teal-100 p-1 rounded-md"><ClipboardList size={14} className="text-teal-600 stroke-[2.5px]"/></div> Exam Papers
+                </h2>
+                <button onClick={() => setShowExamPaperModal(true)} className="text-[12px] bg-white border border-slate-200 hover:border-teal-300 hover:bg-teal-50 text-slate-600 hover:text-teal-700 px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm flex items-center gap-1.5">
+                  <Plus size={14} strokeWidth={2.5} /> New
+                </button>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dataLoading && examPapers.length === 0 ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : examPapers.slice(0, 3).map((paper) => (
+                  <div key={paper._id} onClick={() => !loadingExamPaperId && !deletingExamPaperId && openExamPaper(paper)} className="group cursor-pointer bg-white border border-slate-200 hover:border-teal-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300 relative">
+                    <button onClick={(e) => deleteExamPaper(e, paper._id)} disabled={!!deletingExamPaperId} className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 disabled:hidden">
+                      {deletingExamPaperId === paper._id ? <Loader2 size={14} className="animate-spin text-red-500" /> : <Trash2 size={14} />}
+                    </button>
+                    <div className="flex items-start gap-3">
+                      <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-500 group-hover:bg-teal-500 group-hover:text-white transition-colors duration-300">
+                        {loadingExamPaperId === paper._id ? <Loader2 size={18} className="animate-spin" /> : <ClipboardList size={18} strokeWidth={2.5} />}
+                      </div>
+                      <div className="min-w-0 pt-0.5">
+                        <p className="text-slate-800 font-bold text-sm truncate group-hover:text-teal-700 transition-colors">{paper.title}</p>
+                        <p className="text-slate-500 font-medium text-[11px] mt-0.5">{paper.totalMarks} marks total</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </div>
 
         {/* Empty state when logged out */}
         {!user && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-16"
+            className="text-center py-20"
           >
-            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <BookOpen size={28} className="text-emerald-700" />
+            <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-200/50">
+              <Zap size={28} className="text-emerald-700" />
             </div>
-            <h3 className="text-slate-700 font-bold text-lg mb-2">Sign in to get started</h3>
-            <p className="text-slate-400 text-sm mb-6">Access AI chat, quizzes, flashcards, and more.</p>
+            <h3 className="text-slate-800 font-extrabold text-xl mb-2">Ready to study smarter?</h3>
+            <p className="text-slate-500 text-sm mb-8">Access AI chat, generate quizzes on the fly, and track your unstoppable study streak.</p>
             <button
               onClick={() => setShowAuthModal(true)}
-              className="px-6 py-3 bg-emerald-900 hover:bg-emerald-700 text-white rounded-xl font-semibold text-sm transition-colors"
+              className="px-8 py-3.5 bg-[#111] hover:bg-emerald-900 text-white rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg"
             >
-              Sign in / Register
+              Sign In To Begin
             </button>
           </motion.div>
         )}
