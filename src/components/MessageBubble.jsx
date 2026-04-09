@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { Copy, Check, ExternalLink } from 'lucide-react'
-import { useState, useCallback, lazy, Suspense } from 'react'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
+import { Copy, Check, ExternalLink, Volume2, Square, Star, Layers, Lightbulb, Zap } from 'lucide-react'
+import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
 
 const LazyCodeBlock = lazy(() =>
   Promise.all([
@@ -32,7 +35,7 @@ function CopyButton({ text }) {
   )
 }
 
-export default function MessageBubble({ message, userInitials = 'ME' }) {
+export default function MessageBubble({ message, userInitials = 'ME', isLatest = false, onQuickReply }) {
   const isUser = message.role === 'user'
 
   const timeStr = message.timestamp
@@ -47,6 +50,32 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
       setTimeout(() => setCopiedResponse(false), 2000)
     })
   }, [message.content])
+
+  const [isSaved, setIsSaved] = useState(false)
+  const toggleSave = useCallback(() => setIsSaved(v => !v), [])
+
+  const [isPlaying, setIsPlaying] = useState(false)
+  const toggleTTS = useCallback(() => {
+    if (isPlaying) {
+      window.speechSynthesis.cancel()
+      setIsPlaying(false)
+    } else {
+      if (!message.content) return
+      const utterance = new SpeechSynthesisUtterance(message.content)
+      utterance.onend = () => setIsPlaying(false)
+      utterance.onerror = () => setIsPlaying(false)
+      utterance.rate = 0.95 // slightly slower for better academic pacing
+      window.speechSynthesis.speak(utterance)
+      setIsPlaying(true)
+    }
+  }, [message.content, isPlaying])
+
+  // Cleanup TTS on unmount
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel()
+    }
+  }, [])
 
   return (
     <motion.div
@@ -84,9 +113,10 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
           </div>
         ) : (
           <div className="message-assistant w-full border border-slate-200 bg-[#f9fafb] p-5 rounded-2xl shadow-sm">
-            <div className="prose prose-sm max-w-none prose-p:leading-loose">
+            <div className="prose prose-sm max-w-none prose-p:leading-loose max-w-[100%] overflow-x-hidden">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
                 components={{
                   h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-slate-900">{children}</h1>,
                   h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-slate-900">{children}</h2>,
@@ -167,14 +197,58 @@ export default function MessageBubble({ message, userInitials = 'ME' }) {
             
             {/* AI Action Bar */}
             {!message.streaming && (
-              <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-slate-100 opacity-60 hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={copyResponse}
-                  className="flex items-center justify-center p-1.5 rounded-md hover:bg-emerald-50 hover:text-emerald-700 text-slate-400 transition-colors"
-                  title="Copy response"
-                >
-                  {copiedResponse ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                </button>
+              <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-100">
+                <div className="flex flex-wrap items-center justify-between gap-2 opacity-60 hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1.5 -ml-1.5">
+                    <button 
+                      onClick={copyResponse}
+                      className="flex items-center justify-center p-1.5 rounded-md hover:bg-emerald-50 hover:text-emerald-700 text-slate-400 transition-colors"
+                      title="Copy response"
+                    >
+                      {copiedResponse ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                    </button>
+                    <button 
+                      onClick={toggleTTS}
+                      className={`flex items-center justify-center p-1.5 rounded-md transition-colors ${isPlaying ? 'bg-sky-50 text-sky-600' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'}`}
+                      title={isPlaying ? "Stop audio" : "Read aloud"}
+                    >
+                      {isPlaying ? <Square size={12} className="fill-current" /> : <Volume2 size={14} />}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1.5 -mr-1.5">
+                    <button 
+                      className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-emerald-50 text-emerald-600/70 hover:text-emerald-700 text-xs font-medium transition-colors"
+                      title="Convert to flashcards"
+                    >
+                      <Zap size={13} className="fill-emerald-600/20" /> To Flashcard
+                    </button>
+                    <button 
+                      onClick={toggleSave}
+                      className={`flex items-center justify-center p-1.5 rounded-md transition-colors ${isSaved ? 'text-amber-500 hover:text-amber-600' : 'hover:bg-slate-100 text-slate-400 hover:text-amber-500'}`}
+                      title={isSaved ? "Saved to Notebook" : "Save Note"}
+                    >
+                      <Star size={14} className={isSaved ? "fill-amber-500" : ""} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Reply Pills (Only show on the very last AI message) */}
+                {isLatest && !message.error && (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    <button 
+                      onClick={() => onQuickReply?.("Explain your last message like I'm 5 years old")}
+                      className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-700 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
+                    >
+                      <Lightbulb size={12} /> Explain like I'm 5
+                    </button>
+                    <button 
+                      onClick={() => onQuickReply?.("Can you give me a real-world example of this?")}
+                      className="flex items-center gap-1.5 bg-white border border-slate-200 text-slate-600 hover:bg-sky-50 hover:border-sky-200 hover:text-sky-700 px-3 py-1.5 rounded-full text-xs transition-all shadow-sm"
+                    >
+                      <Layers size={12} /> Give an example
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -152,7 +152,13 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
             </button>
           )}
           {visibleMessages.map((message, index) => (
-            <MessageBubble key={index} message={message} userInitials={userInitials} />
+            <MessageBubble 
+              key={index} 
+              message={message} 
+              userInitials={userInitials} 
+              isLatest={index === visibleMessages.length - 1}
+              onQuickReply={handleSuggestion}
+            />
           ))}
           {/* Show typing indicator only when loading AND no streaming placeholder is already visible */}
           {loading && !messages.some((m) => m.streaming) && (

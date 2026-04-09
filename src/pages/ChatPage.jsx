@@ -103,7 +103,7 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto sidebar-scroll px-4 py-4">
         {user ? (
           <>
-            <p className="text-white/30 text-[10px] font-semibold uppercase tracking-widest mb-3 px-1">
+            <p className="text-emerald-500/70 text-[10px] font-bold uppercase tracking-widest mb-3 px-1">
               Recent Chats
             </p>
             {recentChats.length > 0 && (
@@ -111,30 +111,31 @@ export default function ChatPage() {
                 onClick={async () => {
                   await deleteAllChats()
                 }}
-                className="w-full flex items-center gap-1.5 px-3 py-1.5 mb-2 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-white/[0.06] text-xs font-medium transition-colors"
+                className="w-full flex items-center justify-between gap-1.5 px-3 py-1.5 mb-2 rounded-lg text-slate-400 group hover:text-red-400 hover:bg-red-400/[0.08] text-xs font-medium transition-colors"
+                title="Delete all chat history"
               >
-                <Trash2 size={12} />
-                Delete all chats
+                <span>Clear history</span>
+                <Trash2 size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             )}
             {recentChats.length === 0 ? (
-              <p className="text-white/25 text-xs px-1">No chats yet. Start a new session!</p>
+              <p className="text-white/40 text-xs px-1">No chats yet. Start a new session!</p>
             ) : (
               <>
                 {recentChats.map((chat) => (
                 <div
                   key={chat._id}
                   onClick={() => { loadHistory(chat._id); setSidebarOpen(false) }}
-                  className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-white/50 hover:text-white/80 hover:bg-white/[0.06] cursor-pointer transition-all mb-0.5"
+                  className="group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-slate-300 hover:text-emerald-400 hover:bg-emerald-500/[0.08] cursor-pointer transition-all mb-0.5"
                 >
-                  <MessageSquare size={13} className="flex-shrink-0" />
-                  <span className="text-xs truncate flex-1">{chat.title || 'Untitled'}</span>
+                  <MessageSquare size={13} className="flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                  <span className="text-xs truncate flex-1 font-medium">{chat.title || 'Untitled'}</span>
                   <button
                     onClick={async (e) => {
                       e.stopPropagation()
                       await deleteChat(chat._id)
                     }}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-white/30 hover:text-red-400 transition-all rounded flex-shrink-0"
+                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-500 hover:text-red-400 hover:bg-white/[0.06] transition-all rounded flex-shrink-0"
                     title="Delete chat"
                   >
                     <Trash2 size={11} />
@@ -144,9 +145,9 @@ export default function ChatPage() {
               {chatsHasMore && (
                 <button
                   onClick={loadMoreChats}
-                  className="w-full text-center text-white/30 hover:text-white/60 text-xs py-2 transition-colors"
+                  className="w-full text-center text-slate-400 hover:text-emerald-400 font-medium text-xs py-2 mt-2 transition-colors"
                 >
-                  Load more
+                  Load more chats ↓
                 </button>
               )}
               </>
@@ -166,31 +167,31 @@ export default function ChatPage() {
       </div>
 
       {/* User profile */}
-      <div className="px-4 pb-4 pt-3 border-t border-white/[0.06]">
+      <div className="px-4 pb-6 pt-4 border-t border-white/[0.04]">
         {user ? (
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-slate-700 flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs font-semibold">{userInitials}</span>
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800 border border-emerald-500/20 flex items-center justify-center flex-shrink-0 shadow-md">
+              <span className="text-emerald-50 text-[13px] font-bold">{userInitials}</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="text-white text-xs font-medium truncate">{user.name}</p>
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="flex items-center justify-between mb-0.5">
+                <p className="text-slate-200 text-[13px] font-medium truncate pr-2">{user.name}</p>
                 {streak > 0 && (
-                  <span className="flex items-center gap-0.5 text-[10px] font-bold text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded-full flex-shrink-0">
+                  <span className="flex items-center gap-1 text-[10px] font-extrabold text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded flex-shrink-0 shadow-[0_0_8px_rgba(251,146,60,0.15)]">
                     🔥 {streak}
                   </span>
                 )}
               </div>
-                    <p className="text-white/35 text-[11px] truncate">
-                      {statsLoading ? '— / — tokens' : `${tokenCount.toLocaleString()} / ${tokenLimit.toLocaleString()} tokens`}
+                    <p className="text-slate-400 text-[10px] font-mono tracking-tight truncate">
+                      {statsLoading ? '...' : `${tokenCount.toLocaleString()} / ${tokenLimit.toLocaleString()}`} tkns
                     </p>
             </div>
             <button
               onClick={logout}
-              className="p-1.5 text-white/30 hover:text-white/60 transition-colors rounded hover:bg-white/[0.06]"
+              className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-white/[0.08] transition-all rounded-md ml-1"
               title="Logout"
             >
-              <LogOut size={14} />
+              <LogOut size={15} />
             </button>
           </div>
         ) : (
