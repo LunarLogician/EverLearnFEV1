@@ -1054,6 +1054,42 @@ export default function Home() {
         </Reveal>
       </section>
 
+      {/* ─── DOWNLOAD APP ────────────────────────────────────────────────────── */}
+      <section className="px-5 sm:px-6 py-20 bg-gradient-to-b from-gray-50 to-[#fdfcf8]">
+        <Reveal>
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-1.5 mb-6">
+              <span className="text-xs font-semibold text-emerald-700">📱 Now on Android</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+              Take EverlearnAI everywhere
+            </h2>
+            <p className="mt-4 text-gray-500 max-w-xl mx-auto leading-relaxed">
+              Download our Android app and study on the go. All the same AI tools — MCQs, quizzes, flashcards, chat — right in your pocket.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <a
+                href="/EverlearnAI.apk"
+                download
+                className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-3.5 bg-gray-900 hover:bg-gray-700 text-white rounded-xl font-semibold text-[15px] transition-all shadow-lg hover:-translate-y-0.5"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 2.237l-2.088 3.613a7.87 7.87 0 00-6.87 0L6.477 2.237a.5.5 0 00-.866.5l2.06 3.564A8.002 8.002 0 004 13h16a8.002 8.002 0 00-3.671-6.699l2.06-3.564a.5.5 0 00-.866-.5zM9 10a1 1 0 110-2 1 1 0 010 2zm6 0a1 1 0 110-2 1 1 0 010 2zM4 14v7a1 1 0 001 1h1v-8H4zm15 0v7a1 1 0 01-1 1h-1v-8h2zM7 14v9h4v-9H7zm6 0v9h4v-9h-4z"/></svg>
+                Download for Android
+              </a>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-xl text-[15px] transition-all hover:-translate-y-0.5"
+              >
+                Use on Web <ArrowRight size={15} />
+              </button>
+            </div>
+            <p className="mt-4 text-xs text-gray-400">
+              Android 8.0+ required · iOS coming soon
+            </p>
+          </div>
+        </Reveal>
+      </section>
+
       {/* ─── FOOTER ──────────────────────────────────────────────────────────── */}
       <footer className="border-t border-gray-100 px-5 sm:px-6 py-10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
