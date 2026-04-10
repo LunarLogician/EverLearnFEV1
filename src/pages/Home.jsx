@@ -339,14 +339,15 @@ export default function Home() {
             <span className="hidden sm:inline text-white/50"> — same tools, quizzes & chat on your phone.</span>
           </p>
           <a
-            href="#"
-            aria-label="Get EverlearnAI on Google Play"
+            href="/EverlearnAI.apk"
+            download
+            aria-label="Download EverlearnAI Android App"
             className="shrink-0 inline-flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-gray-100 text-gray-950 rounded-lg text-xs font-semibold transition-all"
           >
             <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 shrink-0" fill="currentColor" aria-hidden="true">
               <path d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm11.155 11.742L1.321 23.566c.116.064.248.1.39.1.145 0 .277-.038.395-.106l13.688-7.754-4.302-4.14zm5.883-5.585L5.119 0 9.507 4.365l8.868 5.716z"/>
             </svg>
-            Get it on Google Play
+            Download Now
           </a>
         </div>
       </div>
