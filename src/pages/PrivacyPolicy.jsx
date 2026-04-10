@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
       <SEOHelmet 
         title="Privacy Policy - EverlearnAI"
         description="Learn how EverlearnAI protects your data and privacy. Transparent privacy practices for students."
-        url="https://everlearn.ai/privacy"
+        url="https://everlearnai.live/privacy"
         keywords="privacy policy, data protection, terms of service"
       />
       <div className="bg-[#fdfcf8] min-h-screen text-gray-900">

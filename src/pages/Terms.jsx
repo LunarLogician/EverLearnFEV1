@@ -10,7 +10,7 @@ export default function Terms() {
       <SEOHelmet 
         title="Terms of Service - EverlearnAI"
         description="Read the terms and conditions for using EverlearnAI study platform."
-        url="https://everlearn.ai/terms"
+        url="https://everlearnai.live/terms"
         keywords="terms of service, terms and conditions, user agreement"
       />
       <div className="bg-[#fdfcf8] min-h-screen text-gray-900">

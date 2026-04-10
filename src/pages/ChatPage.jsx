@@ -213,7 +213,7 @@ export default function ChatPage() {
       <SEOHelmet 
         title="AI Chat - Ask Homework Questions 24/7 - EverlearnAI"
         description="Chat with AI tutor 24/7 for homework help, exam prep, and concept clarification. Get instant answers to any academic question."
-        url="https://everlearn.ai/chat"
+        url="https://everlearnai.live/chat"
         keywords="AI homework help, tutoring, exam prep, study assistant, Q&A"
       />
       <div className="flex h-screen bg-[#f8fafc] dark:bg-[#0f1117] overflow-hidden transition-colors duration-300">

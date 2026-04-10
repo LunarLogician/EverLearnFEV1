@@ -6,4 +6,4 @@ Disallow: /api
 Disallow: /dashboard
 Crawl-delay: 1
 
-Sitemap: https://everlearn.ai/sitemap.xml
+Sitemap: https://everlearnai.live/sitemap.xml

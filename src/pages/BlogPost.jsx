@@ -61,7 +61,7 @@ Research shows that **active recall** (testing yourself) and **spaced repetition
 
 ## Getting Started
 
-The fastest way to try AI-powered studying is to sign up for [EverlearnAI](https://everlearn.ai) — you get 10,000 free tokens with no credit card required. Upload your notes, generate MCQs, and experience the difference AI makes in your study sessions.
+The fastest way to try AI-powered studying is to sign up for [EverlearnAI](https://everlearnai.live) — you get 10,000 free tokens with no credit card required. Upload your notes, generate MCQs, and experience the difference AI makes in your study sessions.
     `,
   },
   'how-to-use-ai-mcq-generator-exam-prep': {
@@ -116,7 +116,7 @@ Use the dashboard to track your quiz scores over time and identify subjects that
 
 ## Get Started Free
 
-Try EverlearnAI's MCQ Generator now — [sign up free](https://everlearn.ai) and generate your first set of practice questions in under 30 seconds.
+Try EverlearnAI's MCQ Generator now — [sign up free](https://everlearnai.live) and generate your first set of practice questions in under 30 seconds.
     `,
   },
   'ai-flashcard-generator-spaced-repetition': {
@@ -172,7 +172,7 @@ The typical spaced repetition schedule:
 - **Use them consistently** — 15 minutes of flashcard review daily beats 2 hours of cramming
 - **Combine with MCQs** — use flashcards for memorization, MCQs for application
 
-Start generating AI flashcards now at [EverlearnAI](https://everlearn.ai) — free to try, no credit card needed.
+Start generating AI flashcards now at [EverlearnAI](https://everlearnai.live) — free to try, no credit card needed.
     `,
   },
   'ai-homework-help-is-it-cheating': {
@@ -308,7 +308,7 @@ AI tools automate the most time-consuming parts (creating questions, making flas
 
 ## Start Your 7-Day Plan Today
 
-Sign up for [EverlearnAI](https://everlearn.ai) and get 10,000 free tokens — enough to generate hundreds of MCQs, flashcards, and get AI tutoring for your first study session.
+Sign up for [EverlearnAI](https://everlearnai.live) and get 10,000 free tokens — enough to generate hundreds of MCQs, flashcards, and get AI tutoring for your first study session.
     `,
   },
   'document-qa-ai-study-hack': {
@@ -366,7 +366,7 @@ Upload any document and ask:
 
 ## Try It Now
 
-Upload your first document on [EverlearnAI](https://everlearn.ai) — supports PDF, DOCX, and PPTX. It's free to start and you'll wonder how you ever studied without it.
+Upload your first document on [EverlearnAI](https://everlearnai.live) — supports PDF, DOCX, and PPTX. It's free to start and you'll wonder how you ever studied without it.
     `,
   },
 }
@@ -402,10 +402,10 @@ export default function BlogPost() {
     "description": post.excerpt,
     "datePublished": post.date,
     "dateModified": post.date,
-    "author": { "@type": "Organization", "name": "EverlearnAI", "url": "https://everlearn.ai" },
-    "publisher": { "@type": "Organization", "name": "EverlearnAI", "logo": { "@type": "ImageObject", "url": "https://everlearn.ai/logo.png" } },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://everlearn.ai/blog/${slug}` },
-    "image": "https://everlearn.ai/logo.png"
+    "author": { "@type": "Organization", "name": "EverlearnAI", "url": "https://everlearnai.live" },
+    "publisher": { "@type": "Organization", "name": "EverlearnAI", "logo": { "@type": "ImageObject", "url": "https://everlearnai.live/logo.png" } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://everlearnai.live/blog/${slug}` },
+    "image": "https://everlearnai.live/logo.png"
   }
 
   return (
@@ -414,7 +414,7 @@ export default function BlogPost() {
         title={`${post.title} | EverlearnAI Blog`}
         description={post.excerpt}
         keywords={post.tags.join(', ') + ', AI study tools, EverlearnAI'}
-        url={`https://everlearn.ai/blog/${slug}`}
+        url={`https://everlearnai.live/blog/${slug}`}
       />
 
       {/* Article Schema */}

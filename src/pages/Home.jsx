@@ -209,7 +209,7 @@ export default function Home() {
       <SEOHelmet 
         title="EverlearnAI - Free MCQ Generator, Quiz Maker & Study Tools"
         description="Generate MCQs, flashcards, and quizzes from any topic. Chat with documents. Get instant homework help. Start free with 10,000 tokens."
-        url="https://everlearn.ai/"
+        url="https://everlearnai.live/"
       />
       <StructuredData />
 

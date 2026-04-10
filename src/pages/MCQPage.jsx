@@ -453,7 +453,7 @@ export default function MCQPage() {
       <SEOHelmet 
         title="MCQ Generator - Create Custom Question Papers - EverlearnAI"
         description="Generate AI-powered MCQs from any topic or document. Create custom question papers instantly for practice and exams."
-        url="https://everlearn.ai/mcq"
+        url="https://everlearnai.live/mcq"
         keywords="MCQ generator, question bank, multiple choice generator, practice questions"
       />
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 sm:p-6">

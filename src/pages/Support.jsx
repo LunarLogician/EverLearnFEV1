@@ -45,7 +45,7 @@ export default function Support() {
       <SEOHelmet 
         title="Help & Support - EverlearnAI"
         description="Find answers to common questions and get support for EverlearnAI features."
-        url="https://everlearn.ai/support"
+        url="https://everlearnai.live/support"
         keywords="help, faq, support, troubleshooting, documentation"
       />
       <div className="bg-[#fdfcf8] min-h-screen text-gray-900">

@@ -6,7 +6,7 @@ export function StructuredData() {
     "@type": "SoftwareApplication",
     "name": "EverlearnAI",
     "description": "AI-powered study tools for students — generate MCQs, quizzes, flashcards, chat with documents, and get instant homework help.",
-    "url": "https://everlearn.ai",
+    "url": "https://everlearnai.live",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "Web",
     "offers": {
@@ -19,7 +19,7 @@ export function StructuredData() {
     "author": {
       "@type": "Organization",
       "name": "EverLearnAI",
-      "url": "https://everlearn.ai"
+      "url": "https://everlearnai.live"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -32,8 +32,8 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "EverlearnAI",
-    "url": "https://everlearn.ai",
-    "logo": "https://everlearn.ai/logo.png",
+    "url": "https://everlearnai.live",
+    "logo": "https://everlearnai.live/logo.png",
     "description": "AI-powered study platform helping students ace exams with MCQs, quizzes, flashcards, and AI tutoring.",
     "sameAs": []
   };
@@ -89,10 +89,10 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "EverlearnAI",
-    "url": "https://everlearn.ai",
+    "url": "https://everlearnai.live",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://everlearn.ai/chat?q={search_term_string}",
+      "target": "https://everlearnai.live/chat?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };

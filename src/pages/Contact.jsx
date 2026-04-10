@@ -10,7 +10,7 @@ export default function Contact() {
       <SEOHelmet 
         title="Contact Us - Support & Feedback - EverlearnAI"
         description="Get in touch with EverlearnAI support team. We're here to help with questions and feedback."
-        url="https://everlearn.ai/contact"
+        url="https://everlearnai.live/contact"
         keywords="contact support, customer support, feedback, help center"
       />
       <div className="bg-[#fdfcf8] min-h-screen text-gray-900">

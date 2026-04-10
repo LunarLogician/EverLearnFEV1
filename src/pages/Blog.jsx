@@ -70,7 +70,7 @@ export default function Blog() {
         title="Blog - AI Study Tips, Guides & Tools | EverlearnAI"
         description="Expert guides on using AI for studying. Learn how to generate MCQs, flashcards, and quizzes with AI. Study tips, exam prep strategies, and AI tool comparisons for students."
         keywords="AI study tips, AI tools for students, how to study with AI, MCQ generator guide, AI flashcards, exam prep AI, study blog"
-        url="https://everlearn.ai/blog"
+        url="https://everlearnai.live/blog"
       />
 
       {/* Nav */}

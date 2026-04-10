@@ -1481,7 +1481,7 @@ export default function Dashboard() {
       <SEOHelmet 
         title="Student Dashboard - Track Progress - EverlearnAI"
         description="Track your study progress, token usage, and quiz scores in one place. Monitor your learning journey."
-        url="https://everlearn.ai/dashboard"
+        url="https://everlearnai.live/dashboard"
         keywords="dashboard, progress tracking, study stats, performance analytics"
       />
       <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f1117] flex flex-col selection:bg-emerald-500/20 transition-colors duration-300">

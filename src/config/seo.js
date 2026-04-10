@@ -1,6 +1,6 @@
 export const SEO_CONFIG = {
   siteName: 'EverlearnAI',
-  siteUrl: 'https://everlearn.ai',
+  siteUrl: 'https://everlearnai.live',
   twitterHandle: '@everlearnai',
   
   pages: {

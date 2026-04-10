@@ -489,7 +489,7 @@ export default function ExamPaperPage() {
       <SEOHelmet 
         title="Exam Paper Generator - Full Question Papers - EverlearnAI"
         description="Generate complete exam papers with long answers and short answers. Perfect for final exam prep."
-        url="https://everlearn.ai/exam-papers"
+        url="https://everlearnai.live/exam-papers"
         keywords="exam paper generator, question paper, practice exam, full paper"
       />
       <div className="min-h-screen bg-gradient-to-br from-teal-50 to-cyan-50 p-4 sm:p-6">
