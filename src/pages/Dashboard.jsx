@@ -1338,13 +1338,9 @@ export default function Dashboard() {
       stat: `${quizzes.length} quiz${quizzes.length !== 1 ? 'zes' : ''} created`,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
         setShowQuizModal(true)
       },
-      actionLabel: userPlan === 'pro' ? 'Generate Quiz' : 'Upgrade to Pro',
+      actionLabel: 'Generate Quiz',
     },
     {
       icon: <Layers size={22} />,
@@ -1356,13 +1352,9 @@ export default function Dashboard() {
       stat: `${flashcardSets.length} set${flashcardSets.length !== 1 ? 's' : ''} created`,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
         setShowFlashcardModal(true)
       },
-      actionLabel: userPlan === 'pro' ? 'Generate Flashcards' : 'Upgrade to Pro',
+      actionLabel: 'Generate Flashcards',
     },
     {
       icon: <BookOpen size={22} />,
@@ -1374,13 +1366,9 @@ export default function Dashboard() {
       stat: `${mcqs.length} mcq${mcqs.length !== 1 ? 's' : ''} created`,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
         setShowMCQModal(true)
       },
-      actionLabel: userPlan === 'pro' ? 'Create MCQs' : 'Upgrade to Pro',
+      actionLabel: 'Create MCQs',
     },
     {
       icon: <FileText size={22} />,
@@ -1414,13 +1402,9 @@ export default function Dashboard() {
       stat: `${examPapers.length} paper${examPapers.length !== 1 ? 's' : ''} created`,
       action: () => {
         if (!user) { setShowAuthModal(true); return }
-        if (userPlan !== 'pro') {
-          window.dispatchEvent(new CustomEvent('upgrade:required', { detail: { requiredPlan: 'pro', currentPlan: userPlan } }))
-          return
-        }
         navigate('/exam-papers')
       },
-      actionLabel: userPlan === 'pro' ? 'Open Exam Papers' : 'Upgrade to Pro',
+      actionLabel: 'Open Exam Papers',
     },
     {
       icon: <BarChart2 size={22} />,
