@@ -132,6 +132,22 @@ const TESTIMONIALS = [
 // Real plans from Lemon Squeezy
 const PLANS = [
   {
+    tier: 'Free',
+    price: 'RS 0',
+    usd: '$0',
+    period: 'forever',
+    desc: '10,000 AI tokens (one-time)',
+    features: [
+      { text: 'All AI tools (Chat, MCQs, Quizzes, Flashcards)', ok: true },
+      { text: 'Document Q&A & summaries', ok: true },
+      { text: 'Assignment generation & analysis', ok: true },
+      { text: '10K tokens (one-time)', ok: true },
+      { text: 'No credit card required', ok: true },
+    ],
+    cta: 'Start Free',
+    featured: false,
+  },
+  {
     tier: 'Basic',
     price: 'RS 399',
     usd: '~$1.41',
@@ -143,7 +159,6 @@ const PLANS = [
       { text: 'Assignment generation & analysis', ok: true },
       { text: 'Chat History', ok: true },
       { text: '200K tokens/month', ok: true },
-      { text: 'Priority support', ok: false },
     ],
     cta: 'Get Basic',
     featured: false,
