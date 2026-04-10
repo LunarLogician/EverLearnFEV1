@@ -56,7 +56,7 @@ export default function ChatWindow({ userInitials = 'ME', onLoginClick, onLimitR
   const handleSuggestion = (text) => {
     if (!user) { onLoginClick?.(); return }
     // Removed FREE_LIMIT check
-    sendMessage(text, null, null, null)
+    sendMessage(text, null, null, null).catch(() => {})
     setTimeout(() => scrollToBottom(), 100)
   }
 

@@ -190,10 +190,9 @@ export default function ChatInput({ isAuthenticated = false, disabled = false, o
       if (imageBase64) removeImage()
       await sendMessage(text, docId, docInfo, imgData)
     } catch (error) {
-      if (error?.response?.data?.upgradeRequired) {
+      if (error?.response?.data?.upgradeRequired || error?.upgradeRequired) {
         onLimitReached?.()
       }
-
     }
   }
 

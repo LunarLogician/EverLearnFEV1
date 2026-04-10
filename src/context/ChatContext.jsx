@@ -190,15 +190,28 @@ export const ChatProvider = ({ children }) => {
       dripIntervalRef.current = null
       dripQueueRef.current = []
       setIsStreaming(false)
-      // Remove both the user message and the empty assistant placeholder
+      // Replace the empty assistant placeholder with the error message
       setMessages((prev) => {
-        const trimmed = [...prev]
-        // Remove trailing assistant placeholder if it's empty / streaming
-        if (trimmed[trimmed.length - 1]?.streaming) trimmed.pop()
-        // Remove the user message
-        if (trimmed[trimmed.length - 1]?.role === 'user') trimmed.pop()
-        return trimmed
+        const updated = [...prev]
+        const last = updated[updated.length - 1]
+        
+        if (last?.role === 'assistant' && last?.streaming) {
+          updated[updated.length - 1] = {
+            role: 'assistant',
+            streaming: false,
+            timestamp: new Date(),
+            content: `⚠️ **Request Failed**\n\n${errorMsg}`
+          }
+        }
+        return updated
       });
+
+      // Optionally dispatch an upgrade event if it's explicitly required
+      if (err.upgradeRequired) {
+        window.dispatchEvent(new CustomEvent('upgrade:required', { 
+          detail: { requiredPlan: err.requiredPlan || 'pro', currentPlan: userPlan } 
+        }))
+      }
 
       throw err;
     } finally {
