@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 
 export function SEOHelmet({ 
-  title = "EverlearnAI — MCQ Prep, Quizzes, Flashcards & Document Q&A",
-  description = "Study smarter with EverlearnAI: generate MCQs, quizzes and flashcards from any topic or file, chat with your documents, and get assignment help. Start free.",
-  image = "/og-image.png",
+  title = "EverlearnAI — AI Study Tools | MCQ Generator, Quiz Maker & Flashcards",
+  description = "AI-powered study tools for students. Generate MCQs, quizzes, and flashcards from any topic. Chat with AI tutor 24/7 for homework help and exam prep. Start free.",
+  image = "/logo.png",
   url = "https://everlearn.ai",
-  keywords = "MCQ generator, quiz maker, flashcards, AI homework help, document Q&A, study tools"
+  keywords = "AI study tools, AI tools for studying, AI tutor, MCQ generator, quiz maker, flashcard generator, AI homework help, exam prep, study assistant AI"
 }) {
   return (
     <Helmet>

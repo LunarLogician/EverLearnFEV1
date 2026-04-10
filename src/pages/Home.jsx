@@ -244,8 +244,8 @@ export default function Home() {
           </div>
 
           <div className="hidden md:flex items-center gap-1">
-            {['Features', 'How it works', 'Pricing'].map((l) => (
-              <a key={l} href={`#${l.toLowerCase().replace(/ /g, '-')}`}
+            {['Features', 'How it works', 'Pricing', 'Blog'].map((l) => (
+              <a key={l} href={l === 'Blog' ? '/blog' : `#${l.toLowerCase().replace(/ /g, '-')}`}
                 className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
                 {l}
               </a>
@@ -298,10 +298,10 @@ export default function Home() {
         {/* Mobile nav dropdown */}
         {mobileNavOpen && (
           <div className="md:hidden border-t border-gray-100 bg-[#fdfcf8]/98 px-5 py-3 space-y-0.5">
-            {['Features', 'How it works', 'Pricing'].map((l) => (
+            {['Features', 'How it works', 'Pricing', 'Blog'].map((l) => (
               <a
                 key={l}
-                href={`#${l.toLowerCase().replace(/ /g, '-')}`}
+                href={l === 'Blog' ? '/blog' : `#${l.toLowerCase().replace(/ /g, '-')}`}
                 onClick={() => setMobileNavOpen(false)}
                 className="block px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
               >
@@ -379,8 +379,8 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
             className="serif text-[clamp(52px,8vw,86px)] leading-[1.05] tracking-[-3px] text-gray-900"
           >
-            Study smarter.<br />
-            <em className="text-emerald-800">Not harder.</em>
+            AI Study Tools.<br />
+            <em className="text-emerald-800">Study Smarter.</em>
           </motion.h1>
 
           <motion.p
@@ -388,7 +388,7 @@ export default function Home() {
             transition={{ duration: 0.6, delay: 0.16 }}
             className="mt-5 text-lg font-light text-gray-500 max-w-xl mx-auto leading-relaxed"
           >
-            Turn your notes into MCQs, quizzes, and flashcards — then test yourself instantly and fix weak areas fast. Chat with your documents and get assignment help when you’re stuck.
+            The #1 AI study assistant — generate MCQs, quizzes, and flashcards from your notes or any topic. Chat with your documents and get AI homework help 24/7.
           </motion.p>
 
           {/* CTAs */}
@@ -1064,7 +1064,7 @@ export default function Home() {
             <span className="font-semibold text-sm">Everlearn<span className="text-emerald-700">AI</span></span>
           </div>
           <div className="flex gap-6">
-            {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Support', '/support'], ['Contact', '/contact']].map(([l, href]) => (
+            {[['Privacy', '/privacy'], ['Terms', '/terms'], ['Support', '/support'], ['Contact', '/contact'], ['Blog', '/blog']].map(([l, href]) => (
               <a key={l} href={href} className="text-sm text-gray-400 hover:text-emerald-700 transition-colors">{l}</a>
             ))}
           </div>

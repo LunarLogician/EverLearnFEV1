@@ -18,6 +18,8 @@ const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const Terms = lazy(() => import('./pages/Terms'))
 const Support = lazy(() => import('./pages/Support'))
 const Contact = lazy(() => import('./pages/Contact'))
+const Blog = lazy(() => import('./pages/Blog'))
+const BlogPost = lazy(() => import('./pages/BlogPost'))
 
 function App() {
   const [paywallOpen, setPaywallOpen] = useState(false)
@@ -50,6 +52,8 @@ function App() {
               <Route path="/terms" element={<Terms />} />
               <Route path="/support" element={<Support />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
             </Routes>
           </Suspense>
           {paywallOpen && (
