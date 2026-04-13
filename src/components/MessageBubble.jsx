@@ -5,7 +5,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import { Copy, Check, ExternalLink, Volume2, Square, Star, Layers, Lightbulb, Zap } from 'lucide-react'
-import { useState, useCallback, lazy, Suspense, useEffect } from 'react'
+import { useState, useCallback, lazy, Suspense, useEffect, memo } from 'react'
 
 const LazyCodeBlock = lazy(() =>
   Promise.all([
@@ -34,6 +34,107 @@ function CopyButton({ text }) {
     </button>
   )
 }
+
+// Memoized ReactMarkdown component to prevent unnecessary re-renders
+const MemoizedReactMarkdown = memo(({ content, streaming }) => {
+  return (
+    <ReactMarkdown
+      remarkPlugins={streaming ? [] : [remarkGfm, remarkMath]} // Skip heavy plugins during streaming
+      rehypePlugins={streaming ? [] : [rehypeKatex]} // Skip math during streaming
+      components={{
+        h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-slate-900 dark:text-white">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-slate-900 dark:text-white">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-slate-800 dark:text-slate-200">{children}</h3>,
+        p: ({ children }) => <p className="mb-2.5 last:mb-0 text-slate-700 dark:text-slate-300 leading-relaxed">{children}</p>,
+        ul: ({ children }) => <ul className="list-disc list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ol>,
+        li: ({ node, children, ...props }) => {
+          // task list item — remark-gfm adds a checkbox input as first child
+          if (node?.children?.[0]?.type === 'element' && node.children[0].tagName === 'input') {
+            return <li className="flex items-start gap-2 text-sm list-none -ml-4">{children}</li>
+          }
+          return <li className="text-sm">{children}</li>
+        },
+        input: ({ checked }) => (
+          <input
+            type="checkbox"
+            checked={!!checked}
+            readOnly
+            className="mt-0.5 h-3.5 w-3.5 rounded accent-emerald-700 flex-shrink-0"
+          />
+        ),
+        strong: ({ children }) => <strong className="font-semibold text-slate-900 dark:text-white">{children}</strong>,
+        em: ({ children }) => <em className="italic text-slate-600 dark:text-slate-400">{children}</em>,
+        del: ({ children }) => <del className="line-through text-slate-400">{children}</del>,
+        a: ({ href, children }) => (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-700 hover:text-emerald-900 underline underline-offset-2 inline-flex items-center gap-0.5"
+          >
+            {children}
+            <ExternalLink size={10} className="flex-shrink-0 opacity-60" />
+          </a>
+        ),
+        hr: () => <hr className="my-3 border-slate-200" />,
+        img: ({ src, alt }) => (
+          <img src={src} alt={alt} className="rounded-xl max-w-full my-2 border border-slate-100" />
+        ),
+        code: ({ inline, className, children }) => {
+          if (inline) {
+            return <code className="bg-emerald-50 border border-emerald-100 rounded-md px-1.5 py-0.5 text-xs font-mono text-emerald-800">{children}</code>
+          }
+          const lang = /language-(\w+)/.exec(className || '')?.[1] || ''
+          const codeStr = String(children).replace(/\n$/, '')
+          
+          // During streaming, show simple code blocks without syntax highlighting
+          if (streaming) {
+            return (
+              <div className="my-3 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
+                  <span className="text-[11px] text-slate-400 font-mono">{lang || 'code'}</span>
+                </div>
+                <pre className="m-0 p-4 bg-slate-50 text-[0.78rem] overflow-x-auto dark:bg-slate-900 dark:text-slate-300">
+                  {codeStr}
+                </pre>
+              </div>
+            )
+          }
+          
+          return (
+            <div className="my-3 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
+                <span className="text-[11px] text-slate-400 font-mono">{lang || 'code'}</span>
+                <CopyButton text={codeStr} />
+              </div>
+              <Suspense fallback={<pre className="m-0 p-4 bg-slate-50 text-[0.78rem] overflow-x-auto">{codeStr}</pre>}>
+                <LazyCodeBlock language={lang || 'text'}>{codeStr}</LazyCodeBlock>
+              </Suspense>
+            </div>
+          )
+        },
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-[3px] border-emerald-500 pl-3 italic text-slate-500 my-2 bg-emerald-50/60 py-1.5 rounded-r-lg pr-3">{children}</blockquote>
+        ),
+        table: ({ children }) => (
+          <div className="overflow-x-auto my-3 rounded-xl border border-slate-200 shadow-sm">
+            <table className="w-full text-sm border-collapse">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="bg-slate-50">{children}</thead>,
+        tbody: ({ children }) => <tbody>{children}</tbody>,
+        tr: ({ children }) => <tr className="border-b border-slate-100 last:border-0">{children}</tr>,
+        th: ({ children }) => <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{children}</th>,
+        td: ({ children }) => <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{children}</td>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+})
+
+MemoizedReactMarkdown.displayName = 'MemoizedReactMarkdown'
 
 export default function MessageBubble({ message, userInitials = 'ME', isLatest = false, onQuickReply }) {
   const isUser = message.role === 'user'
@@ -113,89 +214,12 @@ export default function MessageBubble({ message, userInitials = 'ME', isLatest =
           </div>
         ) : (
           <div className="message-assistant w-full border border-slate-200 dark:border-gray-700 bg-[#f9fafb] dark:bg-[#1a1b23] p-5 rounded-2xl shadow-sm">
-            <div className="prose prose-sm max-w-none prose-p:leading-loose max-w-[100%] overflow-x-hidden">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-                components={{
-                  h1: ({ children }) => <h1 className="text-base font-bold mt-3 mb-1.5 text-slate-900 dark:text-white">{children}</h1>,
-                  h2: ({ children }) => <h2 className="text-sm font-bold mt-2.5 mb-1 text-slate-900 dark:text-white">{children}</h2>,
-                  h3: ({ children }) => <h3 className="text-sm font-semibold mt-2 mb-1 text-slate-800 dark:text-slate-200">{children}</h3>,
-                  p: ({ children }) => <p className="mb-2.5 last:mb-0 text-slate-700 dark:text-slate-300 leading-relaxed">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal list-inside mb-2.5 space-y-1 text-slate-700 dark:text-slate-300">{children}</ol>,
-                  li: ({ node, children, ...props }) => {
-                    // task list item — remark-gfm adds a checkbox input as first child
-                    if (node?.children?.[0]?.type === 'element' && node.children[0].tagName === 'input') {
-                      return <li className="flex items-start gap-2 text-sm list-none -ml-4">{children}</li>
-                    }
-                    return <li className="text-sm">{children}</li>
-                  },
-                  input: ({ checked }) => (
-                    <input
-                      type="checkbox"
-                      checked={!!checked}
-                      readOnly
-                      className="mt-0.5 h-3.5 w-3.5 rounded accent-emerald-700 flex-shrink-0"
-                    />
-                  ),
-                  strong: ({ children }) => <strong className="font-semibold text-slate-900 dark:text-white">{children}</strong>,
-                  em: ({ children }) => <em className="italic text-slate-600 dark:text-slate-400">{children}</em>,
-                  del: ({ children }) => <del className="line-through text-slate-400">{children}</del>,
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-emerald-700 hover:text-emerald-900 underline underline-offset-2 inline-flex items-center gap-0.5"
-                    >
-                      {children}
-                      <ExternalLink size={10} className="flex-shrink-0 opacity-60" />
-                    </a>
-                  ),
-                  hr: () => <hr className="my-3 border-slate-200" />,
-                  img: ({ src, alt }) => (
-                    <img src={src} alt={alt} className="rounded-xl max-w-full my-2 border border-slate-100" />
-                  ),
-                  code: ({ inline, className, children }) => {
-                    if (inline) {
-                      return <code className="bg-emerald-50 border border-emerald-100 rounded-md px-1.5 py-0.5 text-xs font-mono text-emerald-800">{children}</code>
-                    }
-                    const lang = /language-(\w+)/.exec(className || '')?.[1] || ''
-                    const codeStr = String(children).replace(/\n$/, '')
-                    return (
-                      <div className="my-3 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                        <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
-                          <span className="text-[11px] text-slate-400 font-mono">{lang || 'code'}</span>
-                          <CopyButton text={codeStr} />
-                        </div>
-                        <Suspense fallback={<pre className="m-0 p-4 bg-slate-50 text-[0.78rem] overflow-x-auto">{codeStr}</pre>}>
-                          <LazyCodeBlock language={lang || 'text'}>{codeStr}</LazyCodeBlock>
-                        </Suspense>
-                      </div>
-                    )
-                  },
-                  blockquote: ({ children }) => (
-                    <blockquote className="border-l-[3px] border-emerald-500 pl-3 italic text-slate-500 my-2 bg-emerald-50/60 py-1.5 rounded-r-lg pr-3">{children}</blockquote>
-                  ),
-                  table: ({ children }) => (
-                    <div className="overflow-x-auto my-3 rounded-xl border border-slate-200 shadow-sm">
-                      <table className="w-full text-sm border-collapse">{children}</table>
-                    </div>
-                  ),
-                  thead: ({ children }) => <thead className="bg-slate-50">{children}</thead>,
-                  tbody: ({ children }) => <tbody>{children}</tbody>,
-                  tr: ({ children }) => <tr className="border-b border-slate-100 last:border-0">{children}</tr>,
-                  th: ({ children }) => <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">{children}</th>,
-                  td: ({ children }) => <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">{children}</td>,
-                }}
-              >
-                {message.content}
-              </ReactMarkdown>
+            <div className="prose prose-sm max-w-none prose-p:leading-loose max-w-[100%] overflow-x-hidden relative">
+              <MemoizedReactMarkdown content={message.content} streaming={message.streaming} />
               {message.streaming && <span className="streaming-cursor" aria-hidden="true" />}
             </div>
             
-            {/* AI Action Bar */}
+            {/* AI Action Bar - Only show when not streaming */}
             {!message.streaming && (
               <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-gray-700">
                 <div className="flex flex-wrap items-center justify-between gap-2 opacity-60 hover:opacity-100 transition-opacity">

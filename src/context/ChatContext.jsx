@@ -61,33 +61,69 @@ export const ChatProvider = ({ children }) => {
   const dripQueueRef = useRef([])       // pending characters
   const dripIntervalRef = useRef(null)  // setInterval handle
   const abortControllerRef = useRef(null)
+  const lastUpdateRef = useRef(null)    // track last update time for throttling
   const [isStreaming, setIsStreaming] = useState(false)
 
   const startDrip = useCallback(() => {
     if (dripIntervalRef.current) return  // already running
-    dripIntervalRef.current = setInterval(() => {
+    
+    // Use requestAnimationFrame for smoother updates that sync with browser repaints
+    const processDrip = () => {
       if (dripQueueRef.current.length === 0) {
-        clearInterval(dripIntervalRef.current)
         dripIntervalRef.current = null
         return
       }
-      // Drain up to 2 chars per tick — feels natural without being too slow
-      const chars = dripQueueRef.current.splice(0, 200).join('')
-      setMessages((prev) => {
-        const updated = [...prev]
-        const last = updated[updated.length - 1]
-        if (last?.role === 'assistant') {
-          updated[updated.length - 1] = { ...last, content: last.content + chars }
-        }
-        return updated
-      })
-    }, 6) // ~12ms per tick, 5 chars/tick ≈ 300 chars/sec (ChatGPT-speed feel)
+      
+      // Calculate optimal chunk size based on queue length
+      // For smooth streaming, we want smaller chunks more frequently
+      const queueLength = dripQueueRef.current.length
+      let chunkSize
+      if (queueLength > 1000) {
+        // Large backlog: process bigger chunks to catch up
+        chunkSize = Math.min(100, queueLength)
+      } else if (queueLength > 100) {
+        // Medium backlog: moderate chunks
+        chunkSize = Math.min(50, queueLength)
+      } else {
+        // Small queue: small chunks for smooth appearance
+        chunkSize = Math.min(10, queueLength)
+      }
+      
+      const chars = dripQueueRef.current.splice(0, chunkSize).join('')
+      
+      // Use a ref to track the last update time to throttle updates
+      const now = Date.now()
+      if (!lastUpdateRef.current || now - lastUpdateRef.current >= 16) { // ~60fps
+        setMessages((prev) => {
+          const updated = [...prev]
+          const last = updated[updated.length - 1]
+          if (last?.role === 'assistant') {
+            updated[updated.length - 1] = { ...last, content: last.content + chars }
+          }
+          return updated
+        })
+        lastUpdateRef.current = now
+      } else {
+        // If we're updating too fast, batch the characters for next frame
+        dripQueueRef.current.unshift(...chars.split(''))
+      }
+      
+      if (dripQueueRef.current.length > 0) {
+        dripIntervalRef.current = requestAnimationFrame(processDrip)
+      } else {
+        dripIntervalRef.current = null
+      }
+    }
+    
+    dripIntervalRef.current = requestAnimationFrame(processDrip)
   }, [])
 
   const stopGenerating = useCallback(() => {
     abortControllerRef.current?.abort()
-    clearInterval(dripIntervalRef.current)
-    dripIntervalRef.current = null
+    if (dripIntervalRef.current) {
+      cancelAnimationFrame(dripIntervalRef.current)
+      dripIntervalRef.current = null
+    }
     dripQueueRef.current = []
     setMessages((prev) => {
       const updated = [...prev]
@@ -186,8 +222,10 @@ export const ChatProvider = ({ children }) => {
       const errorMsg = err.message || 'Failed to send message';
       setError(errorMsg);
       // Stop the drip and clear the queue so stale characters don't appear
-      clearInterval(dripIntervalRef.current)
-      dripIntervalRef.current = null
+      if (dripIntervalRef.current) {
+        cancelAnimationFrame(dripIntervalRef.current)
+        dripIntervalRef.current = null
+      }
       dripQueueRef.current = []
       setIsStreaming(false)
       // Replace the empty assistant placeholder with the error message

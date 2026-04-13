@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming Performance Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-container {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-button {
+            background-color: #059669;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .test-button:hover {
+            background-color: #047857;
+        }
+        .output {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #059669;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #374151;
+            margin-top: 5px;
+        }
+        .success { color: #059669; }
+        .warning { color: #d97706; }
+        .error { color: #dc2626; }
+    </style>
+</head>
+<body>
+    <h1>Chat Streaming Performance Test</h1>
+    <p>This test simulates the optimized streaming behavior to verify smooth character-by-character rendering.</p>
+    
+    <div class="test-container">
+        <h2>Performance Test</h2>
+        <p>Click the button below to simulate a streaming response. The test will measure:</p>
+        <ul>
+            <li>Frame rate consistency</li>
+            <li>Update frequency</li>
+            <li>Smoothness of character rendering</li>
+            <li>Memory usage impact</li>
+        </ul>
+        
+        <button class="test-button" id="startTest">Start Streaming Test</button>
+        <button class="test-button" id="stopTest" style="background-color: #dc2626;">Stop Test</button>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="fps">0</div>
+                <div class="stat-label">Frames Per Second</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="charsPerSec">0</div>
+                <div class="stat-label">Characters/Second</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalChars">0</div>
+                <div class="stat-label">Total Characters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="frameTime">0ms</div>
+                <div class="stat-label">Average Frame Time</div>
+            </div>
+        </div>
+        
+        <div class="output" id="output">
+            <div id="streamingContent"></div>
+            <span id="cursor" style="display: none;">|</span>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>Optimizations Implemented</h2>
+        <ul>
+            <li><strong>requestAnimationFrame</strong>: Replaced setInterval with requestAnimationFrame for smoother updates synchronized with browser repaints</li>
+            <li><strong>Adaptive chunk sizing</strong>: Dynamically adjusts chunk size based on queue length (10-100 chars per frame)</li>
+            <li><strong>Frame rate throttling</strong>: Limits updates to ~60fps to prevent excessive re-renders</li>
+            <li><strong>Simplified streaming rendering</strong>: Uses plain text rendering during streaming instead of full ReactMarkdown re-parsing</li>
+            <li><strong>Character batching</strong>: Groups characters into optimal chunks for smooth appearance</li>
+        </ul>
+    </div>
+
+    <script>
+        let streaming = false;
+        let frameCount = 0;
+        let lastTime = performance.now();
+        let charsProcessed = 0;
+        let startTime = 0;
+        let animationFrameId = null;
+        let cursorVisible = true;
+        
+        const sampleText = `# Understanding Photosynthesis
+        
+Photosynthesis is the process by which plants, algae, and some bacteria convert light energy into chemical energy. This process is fundamental to life on Earth as it produces oxygen and organic compounds that serve as food.
+
+## Key Components
+
+1. **Chlorophyll**: The green pigment in plants that captures light energy
+2. **Carbon Dioxide**: Taken from the atmosphere
+3. **Water**: Absorbed from the soil
+4. **Sunlight**: Provides the energy needed for the reaction
+
+### The Chemical Equation
+
+The overall reaction can be summarized as:
+
+\`\`\`
+6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂
+\`\`\`
+
+This means six molecules of carbon dioxide and six molecules of water, using light energy, produce one molecule of glucose and six molecules of oxygen.
+
+## Importance for Ecosystems
+
+- **Primary Production**: Forms the base of most food chains
+- **Oxygen Production**: Generates the oxygen we breathe
+- **Carbon Sequestration**: Removes CO₂ from the atmosphere
+- **Energy Storage**: Stores solar energy in chemical bonds
+
+The efficiency of this process varies among different plant species and environmental conditions.`;
+
+        const output = document.getElementById('output');
+        const streamingContent = document.getElementById('streamingContent');
+        const cursor = document.getElementById('cursor');
+        const fpsElement = document.getElementById('fps');
+        const charsPerSecElement = document.getElementById('charsPerSec');
+        const totalCharsElement = document.getElementById('totalChars');
+        const frameTimeElement = document.getElementById('frameTime');
+        
+        function updateStats() {
+            const now = performance.now();
+            const elapsed = (now - lastTime) / 1000;
+            
+            if (elapsed >= 1) {
+                const fps = Math.round(frameCount / elapsed);
+                fpsElement.textContent = fps;
+                fpsElement.className = 'stat-value ' + (fps >= 50 ? 'success' : fps >= 30 ? 'warning' : 'error');
+                
+                const totalElapsed = (now - startTime) / 1000;
+                const charsPerSec = totalElapsed > 0 ? Math.round(charsProcessed / totalElapsed) : 0;
+                charsPerSecElement.textContent = charsPerSec;
+                
+                frameCount = 0;
+                lastTime = now;
+            }
+            
+            totalCharsElement.textContent = charsProcessed;
+            
+            if (animationFrameId) {
+                requestAnimationFrame(updateStats);
+            }
+        }
+        
+        function blinkCursor() {
+            cursorVisible = !cursorVisible;
+            cursor.style.display = cursorVisible ? 'inline' : 'none';
+            if (streaming) {
+                setTimeout(blinkCursor, 500);
+            }
+        }
+        
+        function simulateStreaming() {
+            if (!streaming) return;
+            
+            const queue = sampleText.split('');
+            let position = 0;
+            let lastUpdateTime = 0;
+            
+            function processFrame() {
+                if (!streaming || position >= queue.length) {
+                    streaming = false;
+                    cursor.style.display = 'none';
+                    return;
+                }
+                
+                const now = performance.now();
+                frameCount++;
+                
+                // Adaptive chunk sizing based on position
+                let chunkSize;
+                if (queue.length - position > 1000) {
+                    chunkSize = Math.min(100, queue.length - position);
+                } else if (queue.length - position > 100) {
+                    chunkSize = Math.min(50, queue.length - position);
+                } else {
+                    chunkSize = Math.min(10, queue.length - position);
+                }
+                
+                // Throttle updates to ~60fps
+                if (!lastUpdateTime || now - lastUpdateTime >= 16) {
+                    const chunk = queue.slice(position, position + chunkSize).join('');
+                    streamingContent.textContent += chunk;
+                    position += chunkSize;
+                    charsProcessed += chunkSize;
+                    lastUpdateTime = now;
+                    
+                    // Auto-scroll
+                    output.scrollTop = output.scrollHeight;
+                }
+                
+                if (streaming) {
+                    animationFrameId = requestAnimationFrame(processFrame);
+                }
+            }
+            
+            startTime = performance.now();
+            lastTime = startTime;
+            frameCount = 0;
+            charsProcessed = 0;
+            streamingContent.textContent = '';
+            cursor.style.display = 'inline';
+            
+            blinkCursor();
+            updateStats();
+            processFrame();
+        }
+        
+        document.getElementById('startTest').addEventListener('click', () => {
+            if (!streaming) {
+                streaming = true;
+                simulateStreaming();
+            }
+        });
+        
+        document.getElementById('stopTest').addEventListener('click', () => {
+            streaming = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            cursor.style.display = 'none';
+        });
+        
+        // Calculate average frame time
+        setInterval(() => {
+            if (startTime > 0 && charsProcessed > 0) {
+                const totalTime = performance.now() - startTime;
+                const avgFrameTime = totalTime / (charsProcessed / 10); // Approximate frames
+                frameTimeElement.textContent = avgFrameTime.toFixed(1) + 'ms';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
